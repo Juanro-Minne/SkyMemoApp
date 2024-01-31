@@ -34,16 +34,14 @@ class _LoginPageState extends State<LoginPage> {
       );
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
-      print(e.code);
       Navigator.pop(context);
       if (e.code == 'user-not-found') {
-        print('method1');
         wrongEmailMessage();
-      } 
-      else if (e.code == 'wrong-password') {
+      } else if (e.code == 'wrong-password') {
         wrongPassMessage();
       }
     }
+    Navigator.pop(context);
   }
 
   //validation for wrong email
