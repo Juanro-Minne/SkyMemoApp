@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1096923100233",
+    "project_id": "flight-logbook-app-3dd39",
+    "storage_bucket": "flight-logbook-app-3dd39.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1096923100233:android:b1f3caae51f9c7b2b27b98",
+        "android_client_info": {
+          "package_name": "com.example.flight_logbook"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzN3xUUH4TafEGRA2ktyb905YzFiEltrU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
