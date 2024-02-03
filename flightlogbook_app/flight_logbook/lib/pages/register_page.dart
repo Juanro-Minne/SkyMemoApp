@@ -1,64 +1,37 @@
+//import 'package:flight_logbook/components/custom_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:flight_logbook/components/custom_button.dart';
+import 'package:flight_logbook/components/signupbutton.dart';
 import 'package:flight_logbook/components/textfield.dart';
 import 'package:flight_logbook/components/tile.dart';
+import 'package:flutter/material.dart';
 
-class LoginPage extends StatefulWidget {
-  final VoidCallback showRegisterpage;
-  const LoginPage({Key? key, required this.showRegisterpage}) : super(key: key);
+class RegisterPage extends StatefulWidget {
+  final VoidCallback showLoginPage;
+  const RegisterPage({super.key, required this.showLoginPage});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPassController = TextEditingController();
 
-  void signUserIn() async {
-    try {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Signing in...'),
-              CircularProgressIndicator(),
-            ],
-          ),
-        ),
-      );
-
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
-
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    } catch (e) {
-      print("Error signing in: $e");
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(getErrorMessage(e)),
-          duration: const Duration(seconds: 5),
-        ),
-      );
+  Future signUp() async {
+    if (passwordConfirmed()) {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim());
     }
   }
 
-  String getErrorMessage(dynamic error) {
-    if (error is FirebaseAuthException) {
-      switch (error.code) {
-        case 'user-not-found':
-        case 'wrong-password':
-          return 'Invalid email or password';
-        default:
-          return 'Invalid email or password';
-      }
+  bool passwordConfirmed() {
+    if (passwordController.text.trim() == confirmPassController.text.trim()) {
+      return true;
+    } else {
+      return false;
     }
-    return 'An unexpected error occurred.';
   }
 
   @override
@@ -72,13 +45,16 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 50),
+                // logo
                 const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [SquareTile(imagePath: 'lib/images/logo.png')],
                 ),
+
                 const SizedBox(height: 50),
+
                 Text(
-                  'Login: Welcome back!',
+                  'Hello There register below!',
                   style: TextStyle(
                     decorationColor: Colors.blueGrey,
                     fontWeight: FontWeight.bold,
@@ -86,19 +62,30 @@ class _LoginPageState extends State<LoginPage> {
                     fontSize: 20,
                   ),
                 ),
+
                 const SizedBox(height: 25),
                 MyTextField(
                   controller: emailController,
                   hintText: 'email',
                   obscureText: false,
                 ),
+
                 const SizedBox(height: 25),
                 MyTextField(
                   controller: passwordController,
-                  hintText: 'password',
+                  hintText: 'Password: 6 characters or more',
                   obscureText: true,
                 ),
+                const SizedBox(height: 25),
+                MyTextField(
+                  controller: confirmPassController,
+                  hintText: 'confirm Password',
+                  obscureText: true,
+                ),
+
                 const SizedBox(height: 10),
+
+                // forgot password?
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Row(
@@ -111,10 +98,14 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                 ),
+
                 const SizedBox(height: 25),
-                MyButton(
-                  onTap: signUserIn,
+
+                // sign in button
+                MyButtonSignUp(
+                  onTap: signUp,
                 ),
+
                 const SizedBox(height: 50),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
@@ -142,19 +133,22 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                 ),
+
                 const SizedBox(height: 50),
+
+                // not a member? register now
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Not a member?',
+                      'Already a member!',
                       style: TextStyle(color: Colors.grey[700]),
                     ),
                     const SizedBox(width: 4),
                     GestureDetector(
-                      onTap: widget.showRegisterpage,
+                      onTap: widget.showLoginPage,
                       child: const Text(
-                        'Register now',
+                        'Login here',
                         style: TextStyle(
                           color: Colors.blue,
                           fontWeight: FontWeight.bold,
