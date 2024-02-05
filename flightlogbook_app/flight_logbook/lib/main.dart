@@ -1,4 +1,3 @@
-import 'package:flight_logbook/auth/auth_page.dart';
 import 'package:flight_logbook/firebase_options.dart';
 import 'package:flight_logbook/pages/main_page.dart';
 import 'package:flutter/material.dart';
