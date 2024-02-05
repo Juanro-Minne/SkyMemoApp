@@ -7,7 +7,7 @@ class MyAppBar extends StatefulWidget implements PreferredSizeWidget {
 
   @override
   // TODO: implement preferredSize
-  Size get preferredSize => throw UnimplementedError();
+  Size get preferredSize => AppBar().preferredSize;
 }
 
 class _MyAppBarState extends State<MyAppBar> {
