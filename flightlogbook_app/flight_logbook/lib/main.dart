@@ -10,14 +10,16 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
+ const MyApp({Key? key}) : super(key: key);
+  
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return  MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MainPage(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => MainPage(),
+      },
     );
   }
 }

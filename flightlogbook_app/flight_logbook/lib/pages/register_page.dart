@@ -18,11 +18,38 @@ class _RegisterPageState extends State<RegisterPage> {
   final passwordController = TextEditingController();
   final confirmPassController = TextEditingController();
 
-  Future signUp() async {
-    if (passwordConfirmed()) {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+  Future<void> signUp() async {
+    try {
+      if (passwordConfirmed()) {
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailController.text.trim(),
-          password: passwordController.text.trim());
+          password: passwordController.text.trim(),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        // Display error message to the user
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Registration Failed'),
+              content: Text('The email address is already in use by another account.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        // Handle other FirebaseAuthExceptions
+        print('Firebase Auth Error: ${e.code}');
+      }
     }
   }
 
