@@ -17,13 +17,13 @@ class _MyAppBarState extends State<MyAppBar> {
     return AppBar(
       backgroundColor: const Color.fromARGB(255, 76, 118, 84),
       foregroundColor: const Color.fromARGB(255, 212, 198, 106),
-      elevation: 0, // Remove the shadow
+      elevation: 0,
       title: const Row(
         children: [
           Text(
             'DASHBOARD',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               letterSpacing: 2,
             ),
@@ -38,7 +38,7 @@ class _MyAppBarState extends State<MyAppBar> {
       ],
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(20), // Adjust radius as needed
+          bottom: Radius.circular(10), // Adjust radius as needed
         ),
       ),
     );
