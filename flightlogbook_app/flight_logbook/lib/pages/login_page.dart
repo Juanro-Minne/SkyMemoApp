@@ -15,8 +15,13 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final user = FirebaseAuth.instance.currentUser!;
 
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+}
   void signUserIn() async {
     try {
       ScaffoldMessenger.of(context).showSnackBar(
