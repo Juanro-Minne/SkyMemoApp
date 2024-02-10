@@ -2,11 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class MyAppBar extends StatefulWidget implements PreferredSizeWidget {
+  const MyAppBar({super.key});
+
   @override
   State<MyAppBar> createState() => _MyAppBarState();
 
   @override
-  // TODO: implement preferredSize
   Size get preferredSize => AppBar().preferredSize;
 }
 
@@ -14,12 +15,38 @@ class _MyAppBarState extends State<MyAppBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Color.fromARGB(255, 76, 118, 84),
-      foregroundColor: Color.fromARGB(255, 212, 198, 106),
-      title: Text('Dashboard'),
+      backgroundColor: const Color.fromARGB(255, 76, 118, 84),
+      foregroundColor: const Color.fromARGB(255, 212, 198, 106),
+      elevation: 0, // Remove the shadow
+      title: Row(
+        children: [
+          const Text(
+            'D A S H B O A R D',
+            style: TextStyle(
+              fontSize: 24, // Adjust font size
+              fontWeight: FontWeight.bold, // Apply bold font weight
+              letterSpacing: 2, // Add spacing between letters
+            ),
+          ),
+          const SizedBox(width: 8), // Add spacing between title and image
+          Image.asset(
+            'lib/images/Plane-icon', // Provide your image path here
+            width: 24, // Adjust width as needed
+            height: 24, // Adjust height as needed
+          ),
+        ],
+      ),
       actions: [
-        UserProfileIcon(),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: UserProfileIcon(),
+        ),
       ],
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(20), // Adjust radius as needed
+        ),
+      ),
     );
   }
 }

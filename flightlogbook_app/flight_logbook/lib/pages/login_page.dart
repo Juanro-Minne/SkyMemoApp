@@ -15,15 +15,20 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final user = FirebaseAuth.instance.currentUser!;
 
   void signUserIn() async {
     try {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
+          backgroundColor: Colors.greenAccent,
           content: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Signing in...'),
+              Text(
+                'Signing In....!',
+                style: TextStyle(color: Colors.black),
+              ),
               CircularProgressIndicator(),
             ],
           ),
@@ -37,11 +42,14 @@ class _LoginPageState extends State<LoginPage> {
 
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
     } catch (e) {
-      print("Error signing in: $e");
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(getErrorMessage(e)),
+          backgroundColor: Colors.redAccent.withOpacity(0.7),
+          content: Text(
+            getErrorMessage(e),
+            style: TextStyle(color: Colors.black),
+          ),
           duration: const Duration(seconds: 5),
         ),
       );
