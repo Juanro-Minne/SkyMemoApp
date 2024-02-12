@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -6,7 +7,7 @@ class DashboardScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Dashboard'),
       ),
-      body: Center(child: Text('dashboard Screen')),
+      body: const Center(child: Text('dashboard Screen')),
     );
   }
 }

@@ -4,8 +4,8 @@ class PlanesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Planes')),
-      body: Center(child: Text('Planes Screen')),
+      appBar: AppBar(title: const Text('Planes')),
+      body: const Center(child: Text('Planes Screen')),
     );
   }
 }

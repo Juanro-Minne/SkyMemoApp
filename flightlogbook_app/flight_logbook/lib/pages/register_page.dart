@@ -33,14 +33,14 @@ class _RegisterPageState extends State<RegisterPage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Registration Failed'),
-              content: Text('The email address is already in use by another account.'),
+              title: const Text('Registration Failed'),
+              content: const Text('The email address is already in use by another account.'),
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(); // Close the dialog
                   },
-                  child: Text('OK'),
+                  child: const Text('OK'),
                 ),
               ],
             );
@@ -48,7 +48,7 @@ class _RegisterPageState extends State<RegisterPage> {
         );
       } else {
         // Handle other FirebaseAuthExceptions
-        print('Firebase Auth Error: ${e.code}');
+        //print('Firebase Auth Error: ${e.code}');
       }
     }
   }
