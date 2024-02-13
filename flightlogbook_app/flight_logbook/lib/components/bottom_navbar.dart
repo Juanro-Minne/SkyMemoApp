@@ -17,10 +17,10 @@ class BottomNavBar extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 17),
         child: GNav(
-          color: Color.fromARGB(255, 212, 198, 106),
-          backgroundColor: Color.fromARGB(255, 76, 118, 84),
-          activeColor: Color.fromARGB(255, 212, 198, 106),
-          tabBackgroundColor: Color.fromARGB(255, 62, 99, 68),
+          color: const Color.fromARGB(255, 212, 198, 106),
+          backgroundColor: const Color.fromARGB(255, 76, 118, 84),
+          activeColor: const Color.fromARGB(255, 212, 198, 106),
+          tabBackgroundColor: const Color.fromARGB(255, 62, 99, 68),
           gap: 7,
           selectedIndex: currentIndex, // Set the selected index
           onTabChange: onTap, // Set the callback function

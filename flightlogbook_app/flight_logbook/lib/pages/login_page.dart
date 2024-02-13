@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
           backgroundColor: Colors.redAccent.withOpacity(0.7),
           content: Text(
             getErrorMessage(e),
-            style: TextStyle(color: Colors.black),
+            style: const TextStyle(color: Colors.black),
           ),
           duration: const Duration(seconds: 5),
         ),
