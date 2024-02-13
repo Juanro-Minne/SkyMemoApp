@@ -9,7 +9,6 @@ import 'package:flight_logbook/screens/documents_screen.dart';
 import 'package:flight_logbook/screens/planes_screen.dart';
 import 'package:flutter/material.dart';
 
-
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -25,11 +24,12 @@ class _HomePageState extends State<HomePage> {
   void signUserOut() {
     FirebaseAuth.instance.signOut();
   }
+
   void _onItemTapped(int index) {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

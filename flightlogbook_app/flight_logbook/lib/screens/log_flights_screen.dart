@@ -33,22 +33,39 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                DropdownButtonFormField<String>(
-                  value: _selectedPlaneRegistration,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedPlaneRegistration = value;
-                    });
-                  },
-                  items: _buildDropdownItems(),
-                  decoration: const InputDecoration(labelText: 'Plane Registration'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select plane registration';
+                FutureBuilder<List<String>>(
+                  future: _fetchPlaneRegistrations(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      return DropdownButtonFormField<String>(
+                        value: _selectedPlaneRegistration,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedPlaneRegistration = value;
+                          });
+                        },
+                        items: snapshot.data!.map((registration) {
+                          return DropdownMenuItem(
+                            value: registration,
+                            child: Text(registration),
+                          );
+                        }).toList(),
+                        decoration: const InputDecoration(labelText: 'Plane Registration'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select plane registration';
+                          }
+                          return null;
+                        },
+                      );
                     }
-                    return null;
                   },
                 ),
+                SizedBox(height: 16.0),
                 CustomTextField(
                   controller: _takeoffLocationController,
                   labelText: 'Takeoff Location',
@@ -96,16 +113,17 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
     );
   }
 
-  List<DropdownMenuItem<String>> _buildDropdownItems() {
-    // Fetch plane registrations from Firestore and populate dropdown items
-    // For simplicity, assuming planeRegistrations is a List<String> retrieved from Firestore
-    List<String> planeRegistrations = ['XYZ789', 'LMN456']; // Example data
-    return planeRegistrations
-        .map((registration) => DropdownMenuItem(
-              value: registration,
-              child: Text(registration),
-            ))
-        .toList();
+  Future<List<String>> _fetchPlaneRegistrations() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('planes').get();
+      List<String> planeRegistrations = querySnapshot.docs
+          .map((doc) => doc['planeRegistration'] as String)
+          .toList();
+      return planeRegistrations;
+    } catch (error) {
+      throw error;
+    }
   }
 
   void _logFlight() async {
@@ -131,7 +149,11 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
         );
       }
     } catch (error) {
-      // Handle error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to log flight: $error')
+        ),
+      );
     }
   }
 }
