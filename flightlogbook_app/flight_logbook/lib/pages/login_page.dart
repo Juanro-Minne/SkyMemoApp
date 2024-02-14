@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flight_logbook/components/custom_button.dart';
 import 'package:flight_logbook/components/textfield.dart';
 import 'package:flight_logbook/components/tile.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_button/sign_in_button.dart';
+import 'package:flight_logbook/screens/dashboard_screen.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback showRegisterpage;
@@ -16,12 +19,15 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  final GoogleSignIn googleSignIn = GoogleSignIn();
+
   @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
-}
+  }
+
   void signUserIn() async {
     try {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -47,7 +53,6 @@ class _LoginPageState extends State<LoginPage> {
 
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
     } catch (e) {
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.redAccent.withOpacity(0.7),
@@ -55,7 +60,36 @@ class _LoginPageState extends State<LoginPage> {
             getErrorMessage(e),
             style: const TextStyle(color: Colors.black),
           ),
-          duration: const Duration(seconds: 5),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  Future<void> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleSignInAccount =
+          await googleSignIn.signIn();
+      if (googleSignInAccount != null) {
+        final GoogleSignInAuthentication googleSignInAuthentication =
+            await googleSignInAccount.authentication;
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleSignInAuthentication.accessToken,
+          idToken: googleSignInAuthentication.idToken,
+        );
+        await FirebaseAuth.instance.signInWithCredential(credential);
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => DashboardScreen()));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent.withOpacity(0.7),
+          content: Text(
+            getErrorMessage(e),
+            style: const TextStyle(color: Colors.black),
+          ),
+          duration: const Duration(seconds: 3),
         ),
       );
     }
@@ -132,25 +166,12 @@ class _LoginPageState extends State<LoginPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text(
-                          'Or continue with',
-                          style: TextStyle(color: Colors.grey[700]),
-                        ),
-                      ),
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey[400],
-                        ),
+                      SignInButton(
+                        Buttons.google,
+                        onPressed: signInWithGoogle,
+                        text: 'Sign in with Google',
                       ),
                     ],
                   ),

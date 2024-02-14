@@ -1,6 +1,6 @@
 //import 'package:flight_logbook/components/custom_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flight_logbook/components/signupbutton.dart';
+import 'package:flight_logbook/components/my_button.dart';
 import 'package:flight_logbook/components/textfield.dart';
 import 'package:flight_logbook/components/tile.dart';
 import 'package:flutter/material.dart';
@@ -28,17 +28,17 @@ class _RegisterPageState extends State<RegisterPage> {
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
-        // Display error message to the user
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
               title: const Text('Registration Failed'),
-              content: const Text('The email address is already in use by another account.'),
+              content: const Text(
+                  'The email address is already in use by another account.'),
               actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
+                    Navigator.of(context).pop();
                   },
                   child: const Text('OK'),
                 ),
@@ -128,9 +128,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 const SizedBox(height: 25),
 
-                // sign in button
-                MyButtonSignUp(
+                MyButton(
                   onTap: signUp,
+                  description: "register",
                 ),
 
                 const SizedBox(height: 50),

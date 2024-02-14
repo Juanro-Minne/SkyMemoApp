@@ -2,6 +2,7 @@ import 'package:flight_logbook/components/custom_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flight_logbook/components/my_button.dart';
 
 class LogFlightsScreen extends StatefulWidget {
   const LogFlightsScreen({Key? key}) : super(key: key);
@@ -16,6 +17,7 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
   final _takeoffLocationController = TextEditingController();
   final _destinationController = TextEditingController();
   final _flightTimeController = TextEditingController();
+  final _flightDescription = TextEditingController();
 
   String? _selectedPlaneRegistration;
 
@@ -37,7 +39,7 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
                   future: _fetchPlaneRegistrations(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return const CircularProgressIndicator();
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else {
@@ -54,7 +56,8 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
                             child: Text(registration),
                           );
                         }).toList(),
-                        decoration: const InputDecoration(labelText: 'Plane Registration'),
+                        decoration: const InputDecoration(
+                            labelText: 'Plane Registration'),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please select plane registration';
@@ -65,10 +68,11 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
                     }
                   },
                 ),
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 CustomTextField(
                   controller: _takeoffLocationController,
                   labelText: 'Takeoff Location',
+                  hintText: 'Enter location',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter takeoff location';
@@ -76,9 +80,11 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 15),
                 CustomTextField(
                   controller: _destinationController,
                   labelText: 'Destination',
+                  hintText: 'Enter destination',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter destination';
@@ -86,9 +92,11 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 15),
                 CustomTextField(
                   controller: _flightTimeController,
                   labelText: 'Flight Time',
+                  hintText: 'Enter your flight time',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter flight time';
@@ -96,14 +104,26 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 15),
+                CustomTextField(
+                  controller: _flightDescription,
+                  labelText: 'Fligth Description',
+                  hintText: 'Enter your flight description',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter flight description';
+                    }
+                    return null;
+                  },
+                ),
                 const SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: () {
+                MyButton(
+                  onTap: () {
                     if (_formKey.currentState!.validate()) {
                       _logFlight();
                     }
                   },
-                  child: const Text('Log Flight'),
+                  description: "Log flight",
                 ),
               ],
             ),
@@ -150,9 +170,7 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
       }
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to log flight: $error')
-        ),
+        SnackBar(content: Text('Failed to log flight: $error')),
       );
     }
   }
