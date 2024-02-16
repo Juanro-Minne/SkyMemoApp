@@ -24,11 +24,10 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
   final _destinationController = TextEditingController();
   final _flightTimeController = TextEditingController();
   final _flightDescription = TextEditingController();
-  final _planesRegistrationController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  bool _showTextFields = false;
+  final bool _showTextFields = false;
 
   String? _selectedPlaneRegistration;
 
@@ -47,7 +46,7 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 FutureBuilder<List<String>>(
-                  future: _fetchPlaneRegistrations(),
+                  future: widget.fetchPlaneRegistrations(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const CircularProgressIndicator();
@@ -131,7 +130,7 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
                 MyButton(
                   onTap: () {
                     if (_formKey.currentState!.validate()) {
-                      ();
+                      widget.onLogFlight();
                     }
                   },
                   description: "Log flight",
@@ -142,66 +141,5 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
         ),
       ),
     );
-  }
-
-  Future<List<String>> _fetchPlaneRegistrations() async {
-    try {
-      QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection('planes').get();
-      List<String> planeRegistrations = querySnapshot.docs
-          .map((doc) => doc['registration'] as String)
-          .toList();
-      print('$planeRegistrations');
-      return planeRegistrations;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  void _logFlight() async {
-    try {
-      User? user = _auth.currentUser;
-      if (user != null) {
-        String? planeRegistration = _selectedPlaneRegistration;
-        int flightTime = int.parse(_flightTimeController.text);
-
-        if (planeRegistration != null) {
-          QuerySnapshot planeSnapshot = await _firestore
-              .collection('planes')
-              .where('registration', isEqualTo: planeRegistration)
-              .get();
-          if (planeSnapshot.docs.isNotEmpty) {
-            DocumentSnapshot planeDoc = planeSnapshot.docs.first;
-            int currentTotalHours = planeDoc['totalHours'] ?? 0;
-            int newTotalHours = currentTotalHours + flightTime;
-
-            // Update the plane document with the new total hours
-            await FirebaseFirestore.instance
-                .collection('planes')
-                .doc(planeDoc.id)
-                .update({
-              'totalHours': newTotalHours,
-            });
-
-            _planesRegistrationController.clear();
-            _flightTimeController.clear();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Flight logged successfully')),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Plane not found')),
-            );
-          }
-        }
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.redAccent.withOpacity(0.7),
-          content: Text('Failed to log flight: $e'),
-        ),
-      );
-    }
   }
 }

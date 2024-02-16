@@ -1,9 +1,7 @@
-import 'package:flight_logbook/components/custom_textfield.dart';
 import 'package:flight_logbook/components/flight_logging_form.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flight_logbook/components/my_button.dart';
 
 class LogFlightsScreen extends StatefulWidget {
   const LogFlightsScreen({Key? key}) : super(key: key);
@@ -42,12 +40,71 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
             ),
             if (_showForm)
               FlightLoggingForm(
-                onLogFlight: _logFlight,
                 fetchPlaneRegistrations: _fetchPlaneRegistrations,
+                onLogFlight: _logFlight,
               ),
           ],
         ),
       ),
     );
+  }
+  Future<List<String>> _fetchPlaneRegistrations() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('planes').get();
+      List<String> planeRegistrations = querySnapshot.docs
+          .map((doc) => doc['registration'] as String)
+          .toList();
+      return planeRegistrations;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  void _logFlight() async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        String? planeRegistration = _selectedPlaneRegistration;
+        int flightTime = int.parse(_flightTimeController.text);
+
+        if (planeRegistration != null) {
+          QuerySnapshot planeSnapshot = await _firestore
+              .collection('planes')
+              .where('registration', isEqualTo: planeRegistration)
+              .get();
+          if (planeSnapshot.docs.isNotEmpty) {
+            DocumentSnapshot planeDoc = planeSnapshot.docs.first;
+            int currentTotalHours = planeDoc['totalHours'] ?? 0;
+            int newTotalHours = currentTotalHours + flightTime;
+
+            // Update the plane document with the new total hours
+            await FirebaseFirestore.instance
+                .collection('planes')
+                .doc(planeDoc.id)
+                .update({
+              'totalHours': newTotalHours,
+            });
+
+            _planesRegistrationController.clear();
+            _flightTimeController.clear();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Flight logged successfully')),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Plane not found')),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent.withOpacity(0.7),
+          content: Text('Failed to log flight: $e'),
+        ),
+      );
+    }
   }
 }
