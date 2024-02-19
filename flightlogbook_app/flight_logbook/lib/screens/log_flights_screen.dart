@@ -22,40 +22,52 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Log Flights'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _showForm = !_showForm;
-                });
-              },
-              child: Text(_showForm ? 'Hide Form' : 'Log New Flight'),
+            SizedBox(
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _showForm = !_showForm;
+                  });
+                },
+                child: Text(_showForm ? 'Hide Form' : 'Log New Flight'),
+              ),
             ),
             if (_showForm)
-              FlightLoggingForm(
-                fetchPlaneRegistrations: _fetchPlaneRegistrations,
-                onLogFlight: _logFlight,
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.65,
+                child: FlightLoggingForm(
+                  fetchPlaneRegistrations: _fetchPlaneRegistrations,
+                  onLogFlight: _logFlight,
+                ),
               ),
           ],
         ),
       ),
     );
   }
+
   Future<List<String>> _fetchPlaneRegistrations() async {
     try {
-      QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection('planes').get();
-      List<String> planeRegistrations = querySnapshot.docs
-          .map((doc) => doc['registration'] as String)
-          .toList();
-      return planeRegistrations;
+      String? userEmail = _auth.currentUser?.email;
+
+      if (userEmail != null) {
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('planes')
+            .where('userId', isEqualTo: userEmail)
+            .get();
+        List<String> planeRegistrations = querySnapshot.docs
+            .map((doc) => doc['registration'] as String)
+            .toList();
+        return planeRegistrations;
+      } else {
+        throw Exception('User email was not found');
+      }
     } catch (error) {
       throw error;
     }

@@ -24,7 +24,7 @@ class _PlanesScreenState extends State<PlanesScreen> {
       User? user = _auth.currentUser;
       if (user != null) {
         await _firestore.collection('planes').add({
-          'userId': user.uid,
+          'userId': user.email,
           'registration': _registrationController.text,
           'engineType': _engineTypeController.text,
           'totalHours': int.parse(_totalHoursController.text),
