@@ -1,8 +1,7 @@
-import 'package:flight_logbook/components/custom_textfield.dart';
+import 'package:flight_logbook/components/flight_logging_form.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flight_logbook/components/my_button.dart';
 
 class LogFlightsScreen extends StatefulWidget {
   const LogFlightsScreen({Key? key}) : super(key: key);
@@ -13,12 +12,11 @@ class LogFlightsScreen extends StatefulWidget {
 }
 
 class _LogFlightsScreenState extends State<LogFlightsScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _takeoffLocationController = TextEditingController();
-  final _destinationController = TextEditingController();
+  bool _showForm = false;
   final _flightTimeController = TextEditingController();
-  final _flightDescription = TextEditingController();
-
+  final _planesRegistrationController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String? _selectedPlaneRegistration;
 
   @override
@@ -29,116 +27,33 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                FutureBuilder<List<String>>(
-                  future: _fetchPlaneRegistrations(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      return DropdownButtonFormField<String>(
-                        value: _selectedPlaneRegistration,
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedPlaneRegistration = value;
-                          });
-                        },
-                        items: snapshot.data!.map((registration) {
-                          return DropdownMenuItem(
-                            value: registration,
-                            child: Text(registration),
-                          );
-                        }).toList(),
-                        decoration: const InputDecoration(
-                            labelText: 'Plane Registration'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please select plane registration';
-                          }
-                          return null;
-                        },
-                      );
-                    }
-                  },
-                ),
-                const SizedBox(height: 16.0),
-                CustomTextField(
-                  controller: _takeoffLocationController,
-                  labelText: 'Takeoff Location',
-                  hintText: 'Enter location',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter takeoff location';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 15),
-                CustomTextField(
-                  controller: _destinationController,
-                  labelText: 'Destination',
-                  hintText: 'Enter destination',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter destination';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 15),
-                CustomTextField(
-                  controller: _flightTimeController,
-                  labelText: 'Flight Time',
-                  hintText: 'Enter your flight time',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter flight time';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 15),
-                CustomTextField(
-                  controller: _flightDescription,
-                  labelText: 'Fligth Description',
-                  hintText: 'Enter your flight description',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter flight description';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16.0),
-                MyButton(
-                  onTap: () {
-                    if (_formKey.currentState!.validate()) {
-                      _logFlight();
-                    }
-                  },
-                  description: "Log flight",
-                ),
-              ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _showForm = !_showForm;
+                });
+              },
+              child: Text(_showForm ? 'Hide Form' : 'Log New Flight'),
             ),
-          ),
+            if (_showForm)
+              FlightLoggingForm(
+                fetchPlaneRegistrations: _fetchPlaneRegistrations,
+                onLogFlight: _logFlight,
+              ),
+          ],
         ),
       ),
     );
   }
-
   Future<List<String>> _fetchPlaneRegistrations() async {
     try {
       QuerySnapshot querySnapshot =
           await FirebaseFirestore.instance.collection('planes').get();
       List<String> planeRegistrations = querySnapshot.docs
-          .map((doc) => doc['planeRegistration'] as String)
+          .map((doc) => doc['registration'] as String)
           .toList();
       return planeRegistrations;
     } catch (error) {
@@ -148,29 +63,47 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
 
   void _logFlight() async {
     try {
-      User? user = FirebaseAuth.instance.currentUser;
+      User? user = _auth.currentUser;
       if (user != null) {
-        await FirebaseFirestore.instance.collection('flights').add({
-          'userId': user.email,
-          'planeRegistration': _selectedPlaneRegistration,
-          'takeoffLocation': _takeoffLocationController.text,
-          'destination': _destinationController.text,
-          'flightTime': _flightTimeController.text,
-        });
+        String? planeRegistration = _selectedPlaneRegistration;
+        int flightTime = int.parse(_flightTimeController.text);
 
-        _takeoffLocationController.clear();
-        _destinationController.clear();
-        _flightTimeController.clear();
+        if (planeRegistration != null) {
+          QuerySnapshot planeSnapshot = await _firestore
+              .collection('planes')
+              .where('registration', isEqualTo: planeRegistration)
+              .get();
+          if (planeSnapshot.docs.isNotEmpty) {
+            DocumentSnapshot planeDoc = planeSnapshot.docs.first;
+            int currentTotalHours = planeDoc['totalHours'] ?? 0;
+            int newTotalHours = currentTotalHours + flightTime;
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Flight logged successfully'),
-          ),
-        );
+            // Update the plane document with the new total hours
+            await FirebaseFirestore.instance
+                .collection('planes')
+                .doc(planeDoc.id)
+                .update({
+              'totalHours': newTotalHours,
+            });
+
+            _planesRegistrationController.clear();
+            _flightTimeController.clear();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Flight logged successfully')),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Plane not found')),
+            );
+          }
+        }
       }
-    } catch (error) {
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to log flight: $error')),
+        SnackBar(
+          backgroundColor: Colors.redAccent.withOpacity(0.7),
+          content: Text('Failed to log flight: $e'),
+        ),
       );
     }
   }

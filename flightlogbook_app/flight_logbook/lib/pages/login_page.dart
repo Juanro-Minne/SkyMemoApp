@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flight_logbook/components/custom_button.dart';
@@ -18,13 +20,22 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  StreamSubscription<User?>? _authStateChangesSubscription;
 
   final GoogleSignIn googleSignIn = GoogleSignIn();
+
+  @override
+  void initState() {
+    super.initState();
+    _authStateChangesSubscription =
+        FirebaseAuth.instance.authStateChanges().listen((user) {});
+  }
 
   @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
+    _authStateChangesSubscription?.cancel();
     super.dispose();
   }
 
