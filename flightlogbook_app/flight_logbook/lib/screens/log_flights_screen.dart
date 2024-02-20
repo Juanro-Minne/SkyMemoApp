@@ -1,3 +1,4 @@
+// ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,6 +15,9 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
   bool _showForm = false;
   final _flightTimeController = TextEditingController();
   final _planesRegistrationController = TextEditingController();
+  final _takeoffLocationController = TextEditingController();
+  final _destinationController = TextEditingController();
+  final _flightDescription = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String? _selectedPlaneRegistration;
@@ -77,7 +81,16 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
       User? user = _auth.currentUser;
       if (user != null) {
         String? planeRegistration = _selectedPlaneRegistration;
-        int flightTime = int.parse(_flightTimeController.text);
+        String flightTimeString = _flightTimeController.text.trim();
+        print(
+            'Flight time string: $flightTimeString'); // Trim leading/trailing whitespace
+        if (flightTimeString.isEmpty) {
+          throw const FormatException('Flight time cannot be empty');
+        }
+        int? flightTime = int.tryParse(flightTimeString);
+        if (flightTime == null) {
+          throw const FormatException('Invalid flight time');
+        }
 
         if (planeRegistration != null) {
           QuerySnapshot planeSnapshot = await _firestore
@@ -96,6 +109,15 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
                 .update({
               'totalHours': newTotalHours,
             });
+
+           await FirebaseFirestore.instance.collection('flights').add({
+            'planeRegistration': planeRegistration,
+            'takeoffLocation': _takeoffLocationController.text.trim(),
+            'destination': _destinationController.text.trim(),
+            'flightTime': flightTime,
+            'description': _flightDescription.text.trim(),
+            'timestamp': Timestamp.now(), // Add timestamp
+          });
 
             _planesRegistrationController.clear();
             _flightTimeController.clear();
