@@ -1,13 +1,12 @@
-import 'package:flight_logbook/components/flight_logging_form.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flight_logbook/components/flight_logging_form.dart';
 
 class LogFlightsScreen extends StatefulWidget {
   const LogFlightsScreen({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _LogFlightsScreenState createState() => _LogFlightsScreenState();
 }
 
