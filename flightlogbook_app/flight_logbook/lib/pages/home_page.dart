@@ -1,13 +1,11 @@
-// ignore_for_file: library_private_types_in_public_api, prefer_const_constructors
-
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flight_logbook/components/app_bar.dart';
 import 'package:flight_logbook/components/bottom_navbar.dart';
 import 'package:flight_logbook/screens/log_flights_screen.dart';
 import 'package:flight_logbook/screens/dashboard_screen.dart';
 import 'package:flight_logbook/screens/documents_screen.dart';
 import 'package:flight_logbook/screens/planes_screen.dart';
-import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -18,7 +16,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-
   final user = FirebaseAuth.instance.currentUser!;
 
   void signUserOut() {
@@ -31,14 +28,37 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  String _getTitle(int index) {
+    switch (index) {
+      case 0:
+        return 'Dashboard';
+      case 1:
+        return 'Log Flights';
+      case 2:
+        return 'Planes';
+      case 3:
+        return 'Documents';
+      default:
+        return '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MyAppBar(),
-      body: _getBodyWidget(_selectedIndex),
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+      appBar: MyAppBar(title: _getTitle(_selectedIndex)),
+      body: Stack(
+        children: [
+          _getBodyWidget(_selectedIndex),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            alignment: Alignment.bottomCenter,
+            child: BottomNavBar(
+              currentIndex: _selectedIndex,
+              onTap: _onItemTapped,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -46,15 +66,15 @@ class _HomePageState extends State<HomePage> {
   Widget _getBodyWidget(int index) {
     switch (index) {
       case 0:
-        return DashboardScreen(); // Assuming MainPage is your default screen
+        return DashboardScreen();
       case 1:
         return const LogFlightsScreen();
       case 2:
-        return PlanesScreen();
+        return const PlanesScreen();
       case 3:
         return DocumentsScreen();
       default:
-        return Container(); // Placeholder widget for unknown index
+        return Container();
     }
   }
 }

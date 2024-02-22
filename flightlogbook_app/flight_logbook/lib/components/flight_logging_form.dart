@@ -27,121 +27,113 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Log Flights'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Form(
           key: _formKey,
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.7, // Set height
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  FutureBuilder<List<String>>(
-                    future: widget.fetchPlaneRegistrations(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else {
-                        return DropdownButtonFormField<String>(
-                          value: _selectedPlaneRegistration,
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedPlaneRegistration = value;
-                            });
-                          },
-                          items: snapshot.data!.map((registration) {
-                            return DropdownMenuItem(
-                              value: registration,
-                              child: Text(registration),
-                            );
-                          }).toList(),
-                          decoration: InputDecoration(
-                              enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.blueGrey),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade400),
-                              ),
-                              fillColor: Colors.grey.shade200,
-                              filled: true,
-                              labelText: 'Plane Registration'),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please select plane registration';
-                            }
-                            return null;
-                          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              FutureBuilder<List<String>>(
+                future: widget.fetchPlaneRegistrations(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    return DropdownButtonFormField<String>(
+                      value: _selectedPlaneRegistration,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedPlaneRegistration = value;
+                        });
+                      },
+                      items: snapshot.data!.map((registration) {
+                        return DropdownMenuItem(
+                          value: registration,
+                          child: Text(registration),
                         );
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 10.0),
-                  CustomTextField(
-                    controller: _takeoffLocationController,
-                    labelText: 'Takeoff Location',
-                    hintText: 'Enter location',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter takeoff location';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  CustomTextField(
-                    controller: _destinationController,
-                    labelText: 'Destination',
-                    hintText: 'Enter destination',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter destination';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  CustomTextField(
-                    controller: _flightTimeController,
-                    labelText: 'Flight Time',
-                    hintText: 'Enter your flight time',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter flight time';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  CustomTextField(
-                    controller: _flightDescription,
-                    labelText: 'Fligth Description',
-                    hintText: 'Enter your flight description',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter flight description';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 8.0),
-                  MyButton(
-                    onTap: () {
-                      if (_formKey.currentState!.validate()) {
-                        widget.onLogFlight();
-                      }
-                    },
-                    description: "Log flight",
-                  ),
-                ],
+                      }).toList(),
+                      decoration: InputDecoration(
+                        enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.blueGrey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey.shade400),
+                        ),
+                        fillColor: Colors.grey.shade200,
+                        filled: true,
+                        labelText: 'Plane Registration',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please select plane registration';
+                        }
+                        return null;
+                      },
+                    );
+                  }
+                },
               ),
-            ),
+              const SizedBox(height: 10.0),
+              CustomTextField(
+                controller: _takeoffLocationController,
+                labelText: 'Takeoff Location',
+                hintText: 'Enter location',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter takeoff location';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 10),
+              CustomTextField(
+                controller: _destinationController,
+                labelText: 'Destination',
+                hintText: 'Enter destination',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter destination';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 10),
+              CustomTextField(
+                controller: _flightTimeController,
+                labelText: 'Flight Time',
+                hintText: 'Enter your flight time',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter flight time';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 10),
+              CustomTextField(
+                controller: _flightDescription,
+                labelText: 'Flight Description',
+                hintText: 'Enter your flight description',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter flight description';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 8.0),
+              MyButton(
+                onTap: () {
+                  if (_formKey.currentState!.validate()) {
+                    widget.onLogFlight();
+                  }
+                },
+                description: "Log flight",
+              ),
+            ],
           ),
         ),
       ),

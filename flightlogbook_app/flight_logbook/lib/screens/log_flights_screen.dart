@@ -1,5 +1,5 @@
-import 'package:flight_logbook/components/flight_logging_form.dart';
 import 'package:flutter/material.dart';
+import 'package:flight_logbook/components/flight_logging_form.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -7,7 +7,6 @@ class LogFlightsScreen extends StatefulWidget {
   const LogFlightsScreen({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _LogFlightsScreenState createState() => _LogFlightsScreenState();
 }
 
@@ -21,32 +20,46 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _showForm = !_showForm;
-                  });
-                },
-                child: Text(_showForm ? 'Hide Form' : 'Log New Flight'),
-              ),
-            ),
-            if (_showForm)
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.65,
-                child: FlightLoggingForm(
-                  fetchPlaneRegistrations: _fetchPlaneRegistrations,
-                  onLogFlight: _logFlight,
+    return GestureDetector(
+      onTap: () {
+        // Hide the keyboard and navigation when tapped outside the text fields
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _showForm = !_showForm;
+                      });
+                    },
+                    child: Text(_showForm ? 'Hide Form' : 'Log New Flight'),
+                  ),
                 ),
-              ),
-          ],
+                const SizedBox(height: 10), // Add spacing between the button and the caption
+                const Text(
+                  'Log your flight details below:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10), // Add spacing between the caption and the form
+                if (_showForm)
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.65,
+                    child: FlightLoggingForm(
+                      fetchPlaneRegistrations: _fetchPlaneRegistrations,
+                      onLogFlight: _logFlight,
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );

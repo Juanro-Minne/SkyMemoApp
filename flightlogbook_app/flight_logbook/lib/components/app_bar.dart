@@ -2,7 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class MyAppBar extends StatefulWidget implements PreferredSizeWidget {
-  const MyAppBar({super.key});
+  final String title;
+
+  const MyAppBar({Key? key, required this.title}) : super(key: key);
 
   @override
   State<MyAppBar> createState() => _MyAppBarState();
@@ -18,11 +20,11 @@ class _MyAppBarState extends State<MyAppBar> {
       backgroundColor: const Color.fromARGB(255, 76, 118, 84),
       foregroundColor: const Color.fromARGB(255, 212, 198, 106),
       elevation: 0,
-      title: const Row(
+      title: Row(
         children: [
           Text(
-            'DASHBOARD',
-            style: TextStyle(
+            widget.title.toUpperCase(), // Dynamically set the title
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               letterSpacing: 2,

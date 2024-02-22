@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 class DocumentsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Documents')),
-      body: const Center(child: Text('Documents Screen')),
+    return const Scaffold(
+      body: Center(child: Text('Documents Screen')),
     );
   }
 }

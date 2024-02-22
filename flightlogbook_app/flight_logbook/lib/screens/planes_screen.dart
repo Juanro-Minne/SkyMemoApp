@@ -1,7 +1,9 @@
-import 'package:flight_logbook/components/custom_textfield.dart';
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flight_logbook/components/plane_logging_form.dart';
 
 class PlanesScreen extends StatefulWidget {
   const PlanesScreen({Key? key}) : super(key: key);
@@ -11,6 +13,8 @@ class PlanesScreen extends StatefulWidget {
 }
 
 class _PlanesScreenState extends State<PlanesScreen> {
+  bool _showForm = false;
+  bool _isNavBarVisible = true;
   final TextEditingController _registrationController = TextEditingController();
   final TextEditingController _engineTypeController = TextEditingController();
   final TextEditingController _totalHoursController = TextEditingController();
@@ -20,7 +24,7 @@ class _PlanesScreenState extends State<PlanesScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   void _addPlane() async {
-    try {
+     try {
       User? user = _auth.currentUser;
       if (user != null) {
         await _firestore.collection('planes').add({
@@ -30,7 +34,6 @@ class _PlanesScreenState extends State<PlanesScreen> {
           'totalHours': int.parse(_totalHoursController.text),
           'imageUrl': _imageUrlController.text,
         });
-        // Clear text fields after adding the plane
         _registrationController.clear();
         _engineTypeController.clear();
         _totalHoursController.clear();
@@ -52,66 +55,29 @@ class _PlanesScreenState extends State<PlanesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Planes')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16.0),
-            CustomTextField(
-              controller: _registrationController,
-              labelText: 'Registration',
-              hintText: 'Registration',
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter plane Registration';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16.0),
-            CustomTextField(
-              controller: _engineTypeController,
-              labelText: 'Engine Type',
-              hintText: 'Enter Engine type',
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter plane engine type';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16.0),
-            CustomTextField(
-              controller: _totalHoursController,
-              labelText: 'Total Hours',
-              hintText: 'Enter total hours',
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter total hours';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16.0),
-            CustomTextField(
-              controller: _imageUrlController,
-              labelText: 'Image',
-              hintText: 'Add image',
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please upload image of the plane';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _addPlane,
-              child: const Text('Add Plane'),
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _showForm = !_showForm;
+                    });
+                  },
+                  child: Text(_showForm ? 'Hide Form' : 'Add New Plane'),
+                ),
+              ),
+              if (_showForm)
+                PlaneLoggingForm(
+                  onAddPlane: _addPlane,
+                ),
+            ],
+          ),
         ),
       ),
     );
