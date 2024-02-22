@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,7 +12,6 @@ class PlanesScreen extends StatefulWidget {
 
 class _PlanesScreenState extends State<PlanesScreen> {
   bool _showForm = false;
-  bool _isNavBarVisible = true;
   final TextEditingController _registrationController = TextEditingController();
   final TextEditingController _engineTypeController = TextEditingController();
   final TextEditingController _totalHoursController = TextEditingController();

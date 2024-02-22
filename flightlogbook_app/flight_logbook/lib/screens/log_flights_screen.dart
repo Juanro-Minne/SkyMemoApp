@@ -91,7 +91,7 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
       User? user = _auth.currentUser;
       if (user != null) {
         String? planeRegistration = _selectedPlaneRegistration;
-        int flightTime = int.parse(_flightTimeController.text);
+        int flightTime = int.parse(_flightTimeController.text.trim());
 
         if (planeRegistration != null) {
           QuerySnapshot planeSnapshot = await _firestore
