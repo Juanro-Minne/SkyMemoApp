@@ -4,7 +4,14 @@ import 'package:flight_logbook/components/my_button.dart';
 
 class FlightLoggingForm extends StatefulWidget {
   final Future<List<String>> Function() fetchPlaneRegistrations;
-  final void Function() onLogFlight;
+  final void Function({
+    required String takeoffLocation,
+    required String destination,
+    required String planeRegistration,
+    required int flightTime,
+    required String flightDescription,
+    required DateTime takeoffTime, // Include takeoffTime field
+  }) onLogFlight;
 
   const FlightLoggingForm({
     Key? key,
@@ -23,6 +30,13 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
   final _flightTimeController = TextEditingController();
   final _flightDescription = TextEditingController();
   String? _selectedPlaneRegistration;
+  late DateTime _selectedTakeoffTime;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedTakeoffTime = DateTime.now();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,11 +138,26 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
                   return null;
                 },
               ),
+              const SizedBox(height: 10),
+              Text('Takeoff Time: ${_formatDateTime(_selectedTakeoffTime)}'),
+              ElevatedButton(
+                onPressed: () {
+                  _showDateTimePicker(context);
+                },
+                child: const Text('Select Takeoff Time'),
+              ),
               const SizedBox(height: 8.0),
               MyButton(
                 onTap: () {
                   if (_formKey.currentState!.validate()) {
-                    widget.onLogFlight();
+                    widget.onLogFlight(
+                      takeoffLocation: _takeoffLocationController.text.trim(),
+                      destination: _destinationController.text.trim(),
+                      planeRegistration: _selectedPlaneRegistration!,
+                      flightTime: int.parse(_flightTimeController.text.trim()),
+                      flightDescription: _flightDescription.text.trim(),
+                      takeoffTime: _selectedTakeoffTime,
+                    );
                   }
                 },
                 description: "Log flight",
@@ -138,5 +167,23 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
         ),
       ),
     );
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute}';
+  }
+
+  Future<void> _showDateTimePicker(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedTakeoffTime,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != _selectedTakeoffTime) {
+      setState(() {
+        _selectedTakeoffTime = picked; // Update selected takeoff time
+      });
+    }
   }
 }

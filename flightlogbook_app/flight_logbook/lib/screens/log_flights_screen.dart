@@ -16,7 +16,6 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
   final _planesRegistrationController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  String? _selectedPlaneRegistration;
 
   @override
   Widget build(BuildContext context) {
@@ -43,12 +42,15 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
                     child: Text(_showForm ? 'Hide Form' : 'Log New Flight'),
                   ),
                 ),
-                const SizedBox(height: 10), // Add spacing between the button and the caption
+                const SizedBox(
+                    height:
+                        10), // Add spacing between the button and the caption
                 const Text(
                   'Log your flight details below:',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 10), // Add spacing between the caption and the form
+                const SizedBox(
+                    height: 10), // Add spacing between the caption and the form
                 if (_showForm)
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.65,
@@ -86,41 +88,51 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
     }
   }
 
-  void _logFlight() async {
+  void _logFlight({
+    required String takeoffLocation,
+    required String destination,
+    required String planeRegistration,
+    required int flightTime,
+    required String flightDescription,
+    required DateTime takeoffTime,
+  }) async {
     try {
       User? user = _auth.currentUser;
       if (user != null) {
-        String? planeRegistration = _selectedPlaneRegistration;
-        int flightTime = int.parse(_flightTimeController.text.trim());
+        // Set userId to the logged-in user's email
+        String userId = user.email ?? '';
 
-        if (planeRegistration != null) {
-          QuerySnapshot planeSnapshot = await _firestore
-              .collection('planes')
-              .where('registration', isEqualTo: planeRegistration)
-              .get();
-          if (planeSnapshot.docs.isNotEmpty) {
-            DocumentSnapshot planeDoc = planeSnapshot.docs.first;
-            int currentTotalHours = planeDoc['totalHours'] ?? 0;
-            int newTotalHours = currentTotalHours + flightTime;
+        await _firestore.collection('flights').add({
+          'userId': userId,
+          'takeoffLocation': takeoffLocation,
+          'destination': destination,
+          'planeRegistration': planeRegistration,
+          'flightTime': flightTime,
+          'flightDescription': flightDescription,
+          'takeoffTime': takeoffTime,
+        });
 
-            // Update the plane document with the new total hours
-            await FirebaseFirestore.instance
-                .collection('planes')
-                .doc(planeDoc.id)
-                .update({
-              'totalHours': newTotalHours,
-            });
+        QuerySnapshot planeSnapshot = await _firestore
+            .collection('planes')
+            .where('registration', isEqualTo: planeRegistration)
+            .get();
+        if (planeSnapshot.docs.isNotEmpty) {
+          DocumentSnapshot planeDoc = planeSnapshot.docs.first;
+          int currentTotalHours = planeDoc['totalHours'] ?? 0;
+          int newTotalHours = currentTotalHours + flightTime;
+          await _firestore.collection('planes').doc(planeDoc.id).update({
+            'totalHours': newTotalHours,
+          });
 
-            _planesRegistrationController.clear();
-            _flightTimeController.clear();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Flight logged successfully')),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Plane not found')),
-            );
-          }
+          _planesRegistrationController.clear();
+          _flightTimeController.clear();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Flight logged successfully')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Plane not found')),
+          );
         }
       }
     } catch (e) {
