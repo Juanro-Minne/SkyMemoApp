@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flight_logbook/components/custom_textfield.dart';
-
 class PlaneLoggingForm extends StatefulWidget {
-  final void Function() onAddPlane;
+  final void Function({
+    required String registration,
+    required String engineType,
+    required int totalHours,
+    required String imageUrl,
+  }) onAddPlane;
 
-  const PlaneLoggingForm({Key? key, required this.onAddPlane})
-      : super(key: key);
+  const PlaneLoggingForm({Key? key, required this.onAddPlane}) : super(key: key);
 
   @override
   _PlaneLoggingFormState createState() => _PlaneLoggingFormState();
@@ -75,9 +78,21 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
           ),
           const SizedBox(height: 16.0),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState!.validate()) {
-                widget.onAddPlane();
+                // Get values from text controllers
+                String registration = _registrationController.text.trim();
+                String engineType = _engineTypeController.text.trim();
+                int totalHours = int.parse(_totalHoursController.text.trim());
+                String imageUrl = _imageUrlController.text.trim();
+
+                // Call the onAddPlane function with the collected values
+                widget.onAddPlane(
+                  registration: registration,
+                  engineType: engineType,
+                  totalHours: totalHours,
+                  imageUrl: imageUrl,
+                );
               }
             },
             child: const Text('Add Plane'),
