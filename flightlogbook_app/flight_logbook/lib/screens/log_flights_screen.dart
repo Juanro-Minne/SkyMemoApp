@@ -3,8 +3,8 @@ import 'package:flight_logbook/components/flight_logging_form.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-
 import '../components/custom_tabbar.dart';
+import '../components/tab.dart';
 
 class FlightData {
   final String takeoffLocation;
@@ -18,8 +18,12 @@ class FlightData {
     required this.destination,
     required this.flightTime,
     required this.flightDescription,
-    required this.takeoffTime,
-  });
+    required Timestamp takeoffTime,
+  }) : takeoffTime = takeoffTime.toDate();
+}
+
+String _formatDateTime(DateTime dateTime) {
+  return DateFormat.yMMMd().add_jm().format(dateTime);
 }
 
 class FlightDataSource extends DataTableSource {
@@ -51,9 +55,6 @@ class FlightDataSource extends DataTableSource {
   bool get isRowCountApproximate => false;
   @override
   int get selectedRowCount => 0;
-  String _formatDateTime(DateTime dateTime) {
-    return DateFormat.yMMMd().add_jm().format(dateTime);
-  }
 }
 
 class LogFlightsScreen extends StatefulWidget {
@@ -80,88 +81,127 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        bottom: PreferredSize(
-          preferredSize:
-              Size.fromHeight(kToolbarHeight), // Set the height of the tab bar
-          child: CustomTabBar(
-            tabController: _tabController,
-          ),
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
+      backgroundColor: Colors.white,
+      body: Column(
         children: [
-          _buildFlightLoggingForm(),
-          _buildFlightList(),
+          const SizedBox(height: 5),
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Container(
+              width: MediaQuery.of(context).size.height,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: TabBar(
+                      unselectedLabelColor: Colors.black,
+                      labelColor: Colors.black,
+                      indicatorSize: TabBarIndicatorSize.label,
+                      indicatorWeight: 5,
+                      indicator: BoxDecoration(
+                        color: const Color.fromARGB(255, 219, 219,
+                            219), // Set color for the pill indicator
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      controller: _tabController,
+                      tabs: const [
+                        TabCustom(
+                          padding: EdgeInsets.symmetric(horizontal: 30),
+                          text: 'Log Flights',
+                        ),
+                        TabCustom(
+                          padding: EdgeInsets.symmetric(horizontal: 30),
+                          text: 'View Flights',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildFlightLoggingForm(),
+                _buildFlightList(),
+              ],
+            ),
+          )
         ],
       ),
     );
   }
 
   Widget _buildFlightList() {
-    return Text('this is flights list');
-    // return FutureBuilder<List<Map<String, dynamic>>>(
-    //   future: _fetchFlights(),
-    //   builder: (context, snapshot) {
-    //     if (snapshot.connectionState == ConnectionState.waiting) {
-    //       return Center(child: CircularProgressIndicator());
-    //     } else if (snapshot.hasError) {
-    //       return Center(child: Text('Error: ${snapshot.error}'));
-    //     } else {
-    //       final flights = snapshot.data!;
-    //       final flightData = flights.map((flight) {
-    //         return FlightData(
-    //           takeoffLocation: flight['takeoffLocation'] ?? '',
-    //           destination: flight['destination'] ?? '',
-    //           flightTime: flight['flightTime'] ?? 0,
-    //           flightDescription: flight['flightDescription'] ?? '',
-    //           takeoffTime: flight['takeoffTime'] ?? DateTime.now(),
-    //         );
-    //       }).toList();
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _fetchFlights(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else {
+            final flights = snapshot.data!;
+            final flightData = flights.map((flight) {
+              return FlightData(
+                takeoffLocation: flight['takeoffLocation'] ?? '',
+                destination: flight['destination'] ?? '',
+                flightTime: flight['flightTime'] ?? 0,
+                flightDescription: flight['flightDescription'] ?? '',
+                takeoffTime: flight['takeoffTime'] ?? DateTime.now(),
+              );
+            }).toList();
 
-    //       return Container(
-    //         width: MediaQuery.of(context).size.width,
-    //         height: MediaQuery.of(context).size.height -
-    //             kToolbarHeight -
-    //             kBottomNavigationBarHeight,
-    //         child: PaginatedDataTable(
-    //           header: const Text('Flight List'),
-    //           columns: [
-    //             DataColumn(label: Text('Takeoff Location')),
-    //             DataColumn(label: Text('Destination')),
-    //             DataColumn(label: Text('Flight Time (hours)')),
-    //             DataColumn(label: Text('Flight Description')),
-    //             DataColumn(label: Text('Takeoff Time')),
-    //           ],
-    //           source: FlightDataSource(flightData: flightData),
-    //           rowsPerPage: 3, // Set the number of rows per page
-    //         ),
-    //       );
-    //     }
-    //   },
-    // );
+            return ListView.builder(
+              itemCount: flightData.length,
+              itemBuilder: (context, index) {
+                final flight = flightData[index];
+                return Container(
+                  margin: const EdgeInsets.symmetric(vertical: 5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: const Color.fromARGB(255, 243, 202, 128),
+                  ), // Set tile background color
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.all(10),
+                    title: Text('Flight ${index + 1}'),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Takeoff Location: ${flight.takeoffLocation}'),
+                        Text('Destination: ${flight.destination}'),
+                        Text('Flight Time (hours): ${flight.flightTime}'),
+                        Text('Flight Description: ${flight.flightDescription}'),
+                        Text(
+                            'Takeoff Time: ${_formatDateTime(flight.takeoffTime)}'),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          }
+        },
+      ),
+    );
   }
 
   Widget _buildFlightLoggingForm() {
-    return Text('this is flights log');
-    // return SingleChildScrollView(
-    //   padding: const EdgeInsets.all(16.0),
-    //   child: Column(
-    //     crossAxisAlignment: CrossAxisAlignment.start,
-    //     children: [
-    //       const Text(
-    //         'Log your flight details below:',
-    //         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-    //       ),
-    //       const SizedBox(height: 10),
-    //       FlightLoggingForm(
-    //         fetchPlaneRegistrations: _fetchPlaneRegistrations,
-    //         onLogFlight: _logFlight,
-    //       ),
-    //     ],
-    //   ),
-    // );
+    return FlightLoggingForm(
+      fetchPlaneRegistrations: _fetchPlaneRegistrations,
+      onLogFlight: _logFlight,
+    );
   }
 
   Future<List<String>> _fetchPlaneRegistrations() async {
