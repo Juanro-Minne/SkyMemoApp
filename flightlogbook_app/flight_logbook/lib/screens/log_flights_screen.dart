@@ -84,7 +84,7 @@ class _LogFlightsScreenState extends State<LogFlightsScreen> {
         throw Exception('User email was not found');
       }
     } catch (error) {
-      throw error;
+      rethrow;
     }
   }
 

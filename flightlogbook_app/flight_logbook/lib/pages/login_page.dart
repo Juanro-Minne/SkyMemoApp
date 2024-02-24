@@ -93,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
         );
         await FirebaseAuth.instance.signInWithCredential(credential);
         Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => DashboardScreen()));
+            MaterialPageRoute(builder: (context) => const DashboardScreen()));
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

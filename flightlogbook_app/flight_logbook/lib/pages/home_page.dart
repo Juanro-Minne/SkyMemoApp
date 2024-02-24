@@ -66,13 +66,13 @@ class _HomePageState extends State<HomePage> {
   Widget _getBodyWidget(int index) {
     switch (index) {
       case 0:
-        return DashboardScreen();
+        return const DashboardScreen();
       case 1:
         return const LogFlightsScreen();
       case 2:
         return const PlanesScreen();
       case 3:
-        return DocumentsScreen();
+        return const DocumentsScreen();
       default:
         return Container();
     }
