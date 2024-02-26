@@ -3,7 +3,6 @@ import 'package:flight_logbook/components/flight_logging_form.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import '../components/custom_tabbar.dart';
 import '../components/tab.dart';
 
 class FlightData {
