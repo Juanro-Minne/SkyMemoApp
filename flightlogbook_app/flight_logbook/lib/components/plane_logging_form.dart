@@ -89,7 +89,7 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
               const SizedBox(width: 16.0),
               _imageFile != null
                   ? Text(_imageFile!.path)
-                  : const Text('No image selected'),
+                  : const Text('Please upload a image'),
             ],
           ),
           const SizedBox(height: 8.0),
