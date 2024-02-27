@@ -63,11 +63,11 @@ class _PlanesScreenState extends State<PlanesScreen>
                       tabs: const [
                         TabCustom(
                           padding: EdgeInsets.symmetric(horizontal: 30),
-                          text: 'Log Flights',
+                          text: 'Add Planes',
                         ),
                         TabCustom(
                           padding: EdgeInsets.symmetric(horizontal: 30),
-                          text: 'View Flights',
+                          text: 'View Planes',
                         ),
                       ],
                     ),
