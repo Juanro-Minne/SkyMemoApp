@@ -40,45 +40,44 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void signUserIn() async {
-  try {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        backgroundColor: Colors.greenAccent,
-        content: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Signing In....!',
-              style: TextStyle(color: Colors.black),
-            ),
-            CircularProgressIndicator(),
-          ],
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.greenAccent,
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Signing In....!',
+                style: TextStyle(color: Colors.black),
+              ),
+              CircularProgressIndicator(),
+            ],
+          ),
         ),
-      ),
-    );
+      );
 
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-    );
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent.withOpacity(0.7),
+          content: Text(
+            getErrorMessage(e),
+            style: const TextStyle(color: Colors.black),
+          ),
+          duration: const Duration(seconds: 3),
+        ),
+      );
     }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.redAccent.withOpacity(0.7),
-        content: Text(
-          getErrorMessage(e),
-          style: const TextStyle(color: Colors.black),
-        ),
-        duration: const Duration(seconds: 3),
-      ),
-    );
   }
-}
-
 
   Future<void> signInWithGoogle() async {
     try {
@@ -175,6 +174,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 25),
                 MyButton(
                   onTap: signUserIn,
+                  description: 'Sign In',
                 ),
                 const SizedBox(height: 50),
                 Padding(
