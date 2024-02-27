@@ -108,7 +108,7 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
                 );
               }
             },
-            description: "Log flight",
+            description: "Add Plane",
           ),
         ],
       ),

@@ -15,9 +15,8 @@ class PlanesScreen extends StatefulWidget {
 }
 
 class _PlanesScreenState extends State<PlanesScreen>
-    with SingleTickerProviderStateMixin {
+  with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  bool _showForm = false;
   final TextEditingController _registrationController = TextEditingController();
   final TextEditingController _engineTypeController = TextEditingController();
   final TextEditingController _totalHoursController = TextEditingController();
