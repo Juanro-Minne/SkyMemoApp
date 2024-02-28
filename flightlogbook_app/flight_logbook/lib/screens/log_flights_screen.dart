@@ -25,37 +25,6 @@ String _formatDateTime(DateTime dateTime) {
   return DateFormat.yMMMd().add_jm().format(dateTime);
 }
 
-class FlightDataSource extends DataTableSource {
-  final List<FlightData> flightData;
-
-  FlightDataSource({required this.flightData});
-
-  @override
-  DataRow? getRow(int index) {
-    if (index >= flightData.length) {
-      return null;
-    }
-    final flight = flightData[index];
-    return DataRow.byIndex(
-      index: index,
-      cells: [
-        DataCell(Text(flight.takeoffLocation)),
-        DataCell(Text(flight.destination)),
-        DataCell(Text('${flight.flightTime}')),
-        DataCell(Text(flight.flightDescription)),
-        DataCell(Text(_formatDateTime(flight.takeoffTime))),
-      ],
-    );
-  }
-
-  @override
-  int get rowCount => flightData.length;
-  @override
-  bool get isRowCountApproximate => false;
-  @override
-  int get selectedRowCount => 0;
-}
-
 class LogFlightsScreen extends StatefulWidget {
   const LogFlightsScreen({Key? key}) : super(key: key);
 

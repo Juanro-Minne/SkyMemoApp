@@ -118,10 +118,10 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
               CustomTextField(
                 controller: _flightTimeController,
                 labelText: 'Flight Time',
-                hintText: 'Enter your flight time',
+                hintText: 'Enter your flight duration',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter flight time';
+                    return 'Please enter flight duration';
                   }
                   return null;
                 },
