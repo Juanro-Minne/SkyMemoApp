@@ -116,7 +116,7 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
         future: _fetchFlights(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: LinearProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {

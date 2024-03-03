@@ -35,9 +35,9 @@ class _HomePageState extends State<HomePage> {
       case 1:
         return 'Log Flights';
       case 2:
-        return 'Planes';
+        return 'Manage Planes';
       case 3:
-        return 'Documents';
+        return 'Manage Documents';
       default:
         return '';
     }
