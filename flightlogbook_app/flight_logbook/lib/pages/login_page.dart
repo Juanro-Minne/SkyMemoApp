@@ -11,7 +11,13 @@ import 'package:flight_logbook/screens/dashboard_screen.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback showRegisterpage;
-  const LoginPage({Key? key, required this.showRegisterpage}) : super(key: key);
+  final VoidCallback showForgotPasspage;
+
+  const LoginPage(
+      {Key? key,
+      required this.showRegisterpage,
+      required this.showForgotPasspage})
+      : super(key: key);
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -164,9 +170,15 @@ class _LoginPageState extends State<LoginPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        'Forgot Password?',
-                        style: TextStyle(color: Colors.grey[600]),
+                      GestureDetector(
+                        onTap: widget.showForgotPasspage,
+                        child: const Text(
+                          'Forgot password',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   ),

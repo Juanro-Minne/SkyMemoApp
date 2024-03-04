@@ -48,14 +48,14 @@ class _MyAppBarState extends State<MyAppBar> {
 }
 
 class UserProfileIcon extends StatelessWidget {
-  final user = FirebaseAuth.instance.currentUser!;
-
   void signUserOut() {
     FirebaseAuth.instance.signOut();
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
     return PopupMenuButton<String>(
       onSelected: (value) {
         if (value == 'settings') {
@@ -82,10 +82,13 @@ class UserProfileIcon extends StatelessWidget {
           ),
         ];
       },
-      child: const Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Icon(Icons.person),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Icon(user != null ? Icons.person : Icons.person_outline), // Fix the null check
       ),
     );
   }
 }
+
+
+

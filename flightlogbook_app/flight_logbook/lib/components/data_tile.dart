@@ -16,17 +16,17 @@ class DataTile extends StatelessWidget {
     return Expanded(
       child: Card(
         child: Padding(
-          padding: EdgeInsets.all(25.0),
+          padding: const EdgeInsets.all(25.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Text(
                 value,
-                style: TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 16),
               ),
             ],
           ),

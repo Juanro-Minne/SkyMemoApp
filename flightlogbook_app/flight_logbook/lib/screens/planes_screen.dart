@@ -181,7 +181,7 @@ class _PlanesScreenState extends State<PlanesScreen>
               final planes = snapshot.data!;
               return ListView.builder(
                 shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 itemCount: planes.length,
                 itemBuilder: (context, index) {
                   final plane = planes[index];
@@ -204,7 +204,7 @@ class _PlanesScreenState extends State<PlanesScreen>
                               height: 200,
                               child: Placeholder(),
                             ),
-                      title: Text("Plane Info:"),
+                      title: const Text("Plane Info:"),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
