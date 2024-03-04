@@ -5,7 +5,8 @@ class BottomNavBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
 
-  const BottomNavBar({super.key, 
+  const BottomNavBar({
+    super.key,
     required this.currentIndex,
     required this.onTap,
   });
@@ -22,8 +23,8 @@ class BottomNavBar extends StatelessWidget {
           activeColor: const Color.fromARGB(255, 212, 198, 106),
           tabBackgroundColor: const Color.fromARGB(255, 62, 99, 68),
           gap: 7,
-          selectedIndex: currentIndex, // Set the selected index
-          onTabChange: onTap, // Set the callback function
+          selectedIndex: currentIndex, 
+          onTabChange: onTap, 
           tabs: const [
             GButton(
               icon: Icons.home,

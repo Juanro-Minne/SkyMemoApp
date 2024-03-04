@@ -15,7 +15,7 @@ class PlanesScreen extends StatefulWidget {
 }
 
 class _PlanesScreenState extends State<PlanesScreen>
-  with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _registrationController = TextEditingController();
   final TextEditingController _engineTypeController = TextEditingController();
@@ -164,47 +164,62 @@ class _PlanesScreenState extends State<PlanesScreen>
   }
 
   Widget _buildPlaneList() {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _fetchPlanes(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else {
-            final planes = snapshot.data!;
-            return ListView.builder(
-              itemCount: planes.length,
-              itemBuilder: (context, index) {
-                final plane = planes[index];
-                return Container(
-                  margin: const EdgeInsets.symmetric(vertical: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: const Color.fromARGB(255, 243, 202, 128),
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(10),
-                    title: Text(plane['registration']),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Plane Registration: ${plane['registration']}'),
-                        Text('Engine Type: ${plane['engineType']}'),
-                        Text('Total Hours: ${plane['totalHours']}'),
-                      ],
+    return SingleChildScrollView(
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: FutureBuilder<List<Map<String, dynamic>>>(
+          future: _fetchPlanes(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else {
+              final planes = snapshot.data!;
+              return ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: planes.length,
+                itemBuilder: (context, index) {
+                  final plane = planes[index];
+                  return Container(
+                    margin: const EdgeInsets.symmetric(vertical: 5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: const Color.fromARGB(255, 243, 202, 128),
                     ),
-                  ),
-                );
-              },
-            );
-          }
-        },
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(10),
+                      leading: plane['imageUrl'] != null
+                          ? Image.network(
+                              plane['imageUrl'],
+                              width: 50,
+                              height: 50,
+                            )
+                          : const SizedBox(
+                              width: 150,
+                              height: 200,
+                              child: Placeholder(),
+                            ),
+                      title: Text("Plane Info:"),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Plane Registration: ${plane['registration']}'),
+                          Text('Engine Type: ${plane['engineType']}'),
+                          Text('Total Hours: ${plane['totalHours']}'),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            }
+          },
+        ),
       ),
     );
   }
