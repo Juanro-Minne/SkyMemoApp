@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
@@ -34,36 +36,43 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   }
 
   Future<void> _uploadFile(String type) async {
-    try {
-      final result = await FilePicker.platform.pickFiles();
-      if (result != null) {
-        final file = result.files.first;
-        final fileName = file.name;
-        final fileBytes = file.bytes;
-        final reference = FirebaseStorage.instance.ref('$type/$fileName');
-        final uploadTask = reference.putData(fileBytes!);
-        await uploadTask.whenComplete(() async {
-          User? user = _auth.currentUser;
-          if (user != null) {
-            String downloadUrl = await reference.getDownloadURL();
-            await _firestore.collection('users').doc(user.uid).collection('documents').add({
-              'fileName': fileName,
-              'fileUrl': downloadUrl,
-              'expiryDate': Timestamp.fromDate(_expiryDate),
-              'documentType': type,
-            });
-          } else {
-            print('User is not logged in');
-          }
-          print('File uploaded');
-        });
-      } else {
-        // User canceled the picker
-      }
-    } catch (e) {
-      print('Error uploading file: $e');
+  try {
+    final result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      final file = result.files.first;
+      final fileName = file.name;
+      final fileBytes = file.bytes;
+      final reference = FirebaseStorage.instance.ref('$type/$fileName');
+      final uploadTask = reference.putData(fileBytes!);
+      await uploadTask.whenComplete(() async {
+        User? user = _auth.currentUser;
+        if (user != null) {
+          String downloadUrl = await reference.getDownloadURL();
+          await _firestore.collection('users').doc(user.uid).collection('documents').add({
+            'fileName': fileName,
+            'fileUrl': downloadUrl,
+            'expiryDate': Timestamp.fromDate(_expiryDate),
+            'documentType': type,
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('File uploaded successfully')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('User is not logged in')),
+          );
+        }
+      });
+    } else {
+      // User canceled the picker
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error uploading file: $e')),
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

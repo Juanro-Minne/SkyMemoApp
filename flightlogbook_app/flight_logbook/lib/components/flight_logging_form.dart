@@ -56,6 +56,9 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else {
+
+                    final uniqueRegistrations = snapshot.data!.toSet().toList();
+
                     return DropdownButtonFormField<String>(
                       value: _selectedPlaneRegistration,
                       onChanged: (value) {
@@ -63,7 +66,7 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
                           _selectedPlaneRegistration = value;
                         });
                       },
-                      items: snapshot.data!.map((registration) {
+                      items: uniqueRegistrations.map((registration) {
                         return DropdownMenuItem(
                           value: registration,
                           child: Text(registration),

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -185,33 +187,61 @@ class _PlanesScreenState extends State<PlanesScreen>
                 itemCount: planes.length,
                 itemBuilder: (context, index) {
                   final plane = planes[index];
-                  return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 5),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: const Color.fromARGB(255, 243, 202, 128),
+                  return Dismissible(
+                    key: UniqueKey(),
+                    onDismissed: (direction) {
+                      _deletePlane(plane['plane']);
+                    },
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(20)),
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 20.0),
+                      child: const Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                      ),
                     ),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.all(10),
-                      leading: plane['imageUrl'] != null
-                          ? Image.network(
-                              plane['imageUrl'],
-                              width: 50,
-                              height: 50,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 5),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: const Color.fromARGB(255, 243, 202, 128),
+                      ),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(10),
+                        leading: plane['imageUrl'] != null
+                            ? Image.network(
+                                plane['imageUrl'],
+                                width: 50,
+                                height: 50,
+                              )
+                            : const SizedBox(
+                                width: 150,
+                                height: 200,
+                                child: Placeholder(),
+                              ),
+                        title: const Text("Plane Info:",
+                        style: TextStyle(
+                            decoration: TextDecoration.underline,
+                            fontSize: 19,
+                            color: Colors.black),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                'Plane Registration: ${plane['registration']}'),
+                            Text('Engine Type: ${plane['engineType']}'),
+                            Text('Total Hours: ${plane['totalHours']}'),
+                            const Text(
+                              'note: Swipe to delete flight',
+                              style: TextStyle(fontSize: 13, color: Colors.red),
                             )
-                          : const SizedBox(
-                              width: 150,
-                              height: 200,
-                              child: Placeholder(),
-                            ),
-                      title: const Text("Plane Info:"),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Plane Registration: ${plane['registration']}'),
-                          Text('Engine Type: ${plane['engineType']}'),
-                          Text('Total Hours: ${plane['totalHours']}'),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -222,5 +252,23 @@ class _PlanesScreenState extends State<PlanesScreen>
         ),
       ),
     );
+  }
+
+  Future<void> _deletePlane(String? planeId) async {
+    try {
+      if (planeId != null) {
+        await _firestore.collection('planes').doc(planeId).delete();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Plane deleted successfully')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent.withOpacity(0.7),
+          content: Text('Failed to delete plane: $e'),
+        ),
+      );
+    }
   }
 }

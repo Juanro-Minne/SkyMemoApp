@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flight_logbook/components/flight_logging_form.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,7 +19,7 @@ class FlightData {
     required this.destination,
     required this.flightTime,
     required this.flightDescription,
-    required Timestamp takeoffTime,
+    required Timestamp takeoffTime, required id,
   }) : takeoffTime = takeoffTime.toDate();
 }
 
@@ -106,63 +108,99 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
     );
   }
 
-  Widget _buildFlightList() {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _fetchFlights(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: LinearProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else {
-            final flights = snapshot.data!;
-            final flightData = flights.map((flight) {
-              return FlightData(
-                takeoffLocation: flight['takeoffLocation'] ?? '',
-                destination: flight['destination'] ?? '',
-                flightTime: flight['flightTime'] ?? 0,
-                flightDescription: flight['flightDescription'] ?? '',
-                takeoffTime: flight['takeoffTime'] ?? DateTime.now(),
-              );
-            }).toList();
-
-            return ListView.builder(
-              itemCount: flightData.length,
-              itemBuilder: (context, index) {
-                final flight = flightData[index];
-                return Container(
+ Widget _buildFlightList() {
+  return Container(
+    padding: const EdgeInsets.all(10),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: FutureBuilder<List<Map<String, dynamic>>>(
+      future: _fetchFlights(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: LinearProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else {
+          final flights = snapshot.data!;
+          return ListView.builder(
+            itemCount: flights.length,
+            itemBuilder: (context, index) {
+              final flight = flights[index];
+              return Dismissible(
+                key: Key(flight['id']),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.red,
+                  ),
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: const Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Icon(Icons.delete, color: Colors.white),
+                  ),
+                ),
+                onDismissed: (direction) {
+                  _deleteFlight(flight['id']); // Call delete function
+                },
+                child: Container(
                   margin: const EdgeInsets.symmetric(vertical: 5),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    color: const Color.fromARGB(255, 243, 202, 128),
-                  ), // Set tile background color
+                    color: const Color.fromARGB(255, 220, 212, 197),
+                  ),
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(10),
-                    title: Text('Flight ${index + 1}'),
+                    title: Text(
+                      'Flight ${index + 1}',
+                      style: const TextStyle(
+                        decoration: TextDecoration.underline,
+                        fontSize: 19,
+                        color: Colors.black,
+                      ),
+                    ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Takeoff Location: ${flight.takeoffLocation}'),
-                        Text('Destination: ${flight.destination}'),
-                        Text('Flight Time (hours): ${flight.flightTime}'),
-                        Text('Flight Description: ${flight.flightDescription}'),
-                        Text(
-                            'Takeoff Time: ${_formatDateTime(flight.takeoffTime)}'),
+                        Text('Takeoff Location: ${flight['takeoffLocation']}'),
+                        Text('Destination: ${flight['destination']}'),
+                        Text('Flight Time (hours): ${flight['flightTime']}'),
+                        Text('Flight Description: ${flight['flightDescription']}'),
+                        Text('Takeoff Time: ${_formatDateTime(flight['takeoffTime'].toDate())}'),
+
+                        const Text(
+                          'note: Swipe to delete flight',
+                          style: TextStyle(fontSize: 13, color: Colors.red),
+                        )
                       ],
                     ),
                   ),
-                );
-              },
-            );
-          }
-        },
-      ),
-    );
+                ),
+              );
+            },
+          );
+        }
+      },
+    ),
+  );
+}
+
+
+  Future<void> _deleteFlight(String flightId) async {
+    try {
+      await _firestore.collection('flights').doc(flightId).delete();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Flight deleted successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent.withOpacity(0.7),
+          content: Text('Failed to delete flight: $e'),
+        ),
+      );
+    }
   }
 
   Widget _buildFlightLoggingForm() {
@@ -194,22 +232,27 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
   }
 
   Future<List<Map<String, dynamic>>> _fetchFlights() async {
-    try {
-      final userEmail = _auth.currentUser?.email;
-      if (userEmail != null) {
-        final querySnapshot = await FirebaseFirestore.instance
-            .collection('flights')
-            .where('userId', isEqualTo: userEmail)
-            .get();
-        final flights = querySnapshot.docs.map((doc) => doc.data()).toList();
-        return flights;
-      } else {
-        throw Exception('User email was not found');
-      }
-    } catch (error) {
-      rethrow;
+  try {
+    final userEmail = _auth.currentUser?.email;
+    if (userEmail != null) {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('flights')
+          .where('userId', isEqualTo: userEmail)
+          .get();
+      final flights = querySnapshot.docs.map((doc) {
+        Map<String, dynamic> flightData = doc.data() as Map<String, dynamic>;
+        flightData['id'] = doc.id;
+        return flightData;
+      }).toList();
+      return flights;
+    } else {
+      throw Exception('User email was not found');
     }
+  } catch (error) {
+    rethrow;
   }
+}
+
 
   void _logFlight({
     required String takeoffLocation,
@@ -224,7 +267,7 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
       if (user != null) {
         String userId = user.email ?? '';
 
-        await _firestore.collection('flights').add({
+        DocumentReference flightRef = await _firestore.collection('flights').add({
           'userId': userId,
           'takeoffLocation': takeoffLocation,
           'destination': destination,
@@ -233,6 +276,8 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
           'flightDescription': flightDescription,
           'takeoffTime': takeoffTime,
         });
+
+        String flightId = flightRef.id;
 
         QuerySnapshot planeSnapshot = await _firestore
             .collection('planes')
@@ -248,6 +293,7 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
 
           _planesRegistrationController.clear();
           _flightTimeController.clear();
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Flight logged successfully')),
           );
