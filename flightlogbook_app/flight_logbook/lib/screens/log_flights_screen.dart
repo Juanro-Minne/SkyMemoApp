@@ -74,7 +74,7 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
                       indicatorWeight: 5,
                       indicator: BoxDecoration(
                         color: const Color.fromARGB(255, 219, 219,
-                            219), // Set color for the pill indicator
+                            219),
                         borderRadius: BorderRadius.circular(5),
                       ),
                       controller: _tabController,
@@ -252,7 +252,6 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
     rethrow;
   }
 }
-
 
   void _logFlight({
     required String takeoffLocation,

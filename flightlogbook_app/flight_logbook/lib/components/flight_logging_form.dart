@@ -10,7 +10,7 @@ class FlightLoggingForm extends StatefulWidget {
     required String planeRegistration,
     required int flightTime,
     required String flightDescription,
-    required DateTime takeoffTime, // Include takeoffTime field
+    required DateTime takeoffTime,
   }) onLogFlight;
 
   const FlightLoggingForm({
