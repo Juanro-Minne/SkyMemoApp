@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -16,7 +16,6 @@ class DocumentsScreen extends StatefulWidget {
 
 class _DocumentsScreenState extends State<DocumentsScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   late DateTime _expiryDate = DateTime.now();

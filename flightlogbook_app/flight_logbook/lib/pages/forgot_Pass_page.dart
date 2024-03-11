@@ -37,14 +37,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         },
       );
     } on FirebaseAuthException catch (e) {
-      print(e);
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: Text(e.message.toString()),
-          );
-        },
+     ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent.withOpacity(0.7),
+          content: Text('Failed to reset password: $e'),
+        ),
       );
     }
   }

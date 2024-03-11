@@ -1,4 +1,4 @@
-import 'package:flight_logbook/pages/forgot_Pass_page.dart';
+import 'package:flight_logbook/pages/forgot_pass_page.dart';
 import 'package:flight_logbook/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import '../pages/register_page.dart';

@@ -239,8 +239,9 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
           .collection('flights')
           .where('userId', isEqualTo: userEmail)
           .get();
+
       final flights = querySnapshot.docs.map((doc) {
-        Map<String, dynamic> flightData = doc.data() as Map<String, dynamic>;
+        Map<String, dynamic> flightData = doc.data();
         flightData['id'] = doc.id;
         return flightData;
       }).toList();
@@ -266,7 +267,7 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
       if (user != null) {
         String userId = user.email ?? '';
 
-        DocumentReference flightRef = await _firestore.collection('flights').add({
+        await _firestore.collection('flights').add({
           'userId': userId,
           'takeoffLocation': takeoffLocation,
           'destination': destination,
@@ -275,8 +276,6 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
           'flightDescription': flightDescription,
           'takeoffTime': takeoffTime,
         });
-
-        String flightId = flightRef.id;
 
         QuerySnapshot planeSnapshot = await _firestore
             .collection('planes')
