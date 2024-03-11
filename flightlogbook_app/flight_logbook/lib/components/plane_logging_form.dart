@@ -14,7 +14,8 @@ class PlaneLoggingForm extends StatefulWidget {
     required File? imageFile,
   }) onAddPlane;
 
-  const PlaneLoggingForm({Key? key, required this.onAddPlane}) : super(key: key);
+  const PlaneLoggingForm({Key? key, required this.onAddPlane})
+      : super(key: key);
 
   @override
   _PlaneLoggingFormState createState() => _PlaneLoggingFormState();
@@ -24,7 +25,7 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
   final TextEditingController _registrationController = TextEditingController();
   final TextEditingController _engineTypeController = TextEditingController();
   final TextEditingController _totalHoursController = TextEditingController();
-  final _formKey = GlobalKey<FormState>(); 
+  final _formKey = GlobalKey<FormState>();
   File? _imageFile;
 
   @override
@@ -33,8 +34,8 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Form( 
-            key: _formKey, 
+          child: Form(
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -78,8 +79,15 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
                 Row(
                   children: [
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blueGrey,
+                          foregroundColor:
+                              const Color.fromARGB(255, 245, 228, 178),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8))),
                       onPressed: () async {
-                        final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                        final pickedFile = await ImagePicker()
+                            .pickImage(source: ImageSource.gallery);
                         if (pickedFile != null) {
                           setState(() {
                             _imageFile = File(pickedFile.path);
@@ -88,29 +96,45 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
                       },
                       child: const Text('Pick Image'),
                     ),
-                    const SizedBox(width: 16.0),
+                    const SizedBox(width: 10.0),
                     _imageFile != null
                         ? Text(_imageFile!.path)
                         : const Text('No image selected'),
                   ],
                 ),
-                const SizedBox(height: 8.0),
-                MyButton(
-                  onTap: () async {
-                    if (_formKey.currentState!.validate()) { 
-                      String registration = _registrationController.text.trim();
-                      String engineType = _engineTypeController.text.trim();
-                      int totalHours = int.parse(_totalHoursController.text.trim());
-        
-                      widget.onAddPlane(
-                        registration: registration,
-                        engineType: engineType,
-                        totalHours: totalHours,
-                        imageFile: _imageFile,
-                      );
-                    }
-                  },
-                  description: "Add Plane",
+                const SizedBox(height: 20.0),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: MyButton(
+                    onTap: () async {
+                      if (_formKey.currentState!.validate()) {
+                        String registration =
+                            _registrationController.text.trim();
+                        String engineType = _engineTypeController.text.trim();
+                        int totalHours =
+                            int.parse(_totalHoursController.text.trim());
+
+                        widget.onAddPlane(
+                          registration: registration,
+                          engineType: engineType,
+                          totalHours: totalHours,
+                          imageFile: _imageFile,
+                        );
+                      }
+                    },
+                    description: "Add Plane",
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: MyButton(
+                    onTap: () {
+                      _engineTypeController.clear();
+                      _registrationController.clear();
+                      _totalHoursController.clear();
+                    },
+                    description: "Clear",
+                  ),
                 ),
               ],
             ),
