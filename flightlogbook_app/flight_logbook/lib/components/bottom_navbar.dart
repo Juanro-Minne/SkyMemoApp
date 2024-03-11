@@ -16,15 +16,15 @@ class BottomNavBar extends StatelessWidget {
     return Container(
       color: const Color.fromARGB(255, 76, 118, 84),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 17),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 11),
         child: GNav(
           color: const Color.fromARGB(255, 212, 198, 106),
           backgroundColor: const Color.fromARGB(255, 76, 118, 84),
           activeColor: const Color.fromARGB(255, 212, 198, 106),
           tabBackgroundColor: const Color.fromARGB(255, 62, 99, 68),
           gap: 7,
-          selectedIndex: currentIndex, 
-          onTabChange: onTap, 
+          selectedIndex: currentIndex,
+          onTabChange: onTap,
           tabs: const [
             GButton(
               icon: Icons.home,
