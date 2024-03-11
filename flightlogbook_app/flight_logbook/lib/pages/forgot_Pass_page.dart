@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, file_names
+// ignore_for_file: use_build_context_synchronously
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flight_logbook/components/app_bar.dart';
 import 'package:flight_logbook/components/custom_button.dart';
@@ -37,7 +37,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         },
       );
     } on FirebaseAuthException catch (e) {
-     ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.redAccent.withOpacity(0.7),
           content: Text('Failed to reset password: $e'),

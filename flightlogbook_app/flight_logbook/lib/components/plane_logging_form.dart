@@ -30,88 +30,90 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Form( 
-          key: _formKey, 
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10.0),
-              CustomTextField(
-                controller: _registrationController,
-                labelText: 'Registration',
-                hintText: 'Registration',
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter plane Registration:ex: ZS-ABC';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 10.0),
-              CustomTextField(
-                controller: _engineTypeController,
-                labelText: 'Engine Type',
-                hintText: 'Enter Engine type',
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter plane engine type';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16.0),
-              CustomTextField(
-                controller: _totalHoursController,
-                labelText: 'Total Hours',
-                hintText: 'Enter total hours on Plane',
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter total hours';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16.0),
-              Row(
-                children: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-                      if (pickedFile != null) {
-                        setState(() {
-                          _imageFile = File(pickedFile.path);
-                        });
-                      }
-                    },
-                    child: const Text('Pick Image'),
-                  ),
-                  const SizedBox(width: 16.0),
-                  _imageFile != null
-                      ? Text(_imageFile!.path)
-                      : const Text('No image selected'),
-                ],
-              ),
-              const SizedBox(height: 8.0),
-              MyButton(
-                onTap: () async {
-                  if (_formKey.currentState!.validate()) { 
-                    String registration = _registrationController.text.trim();
-                    String engineType = _engineTypeController.text.trim();
-                    int totalHours = int.parse(_totalHoursController.text.trim());
-
-                    widget.onAddPlane(
-                      registration: registration,
-                      engineType: engineType,
-                      totalHours: totalHours,
-                      imageFile: _imageFile,
-                    );
-                  }
-                },
-                description: "Add Plane",
-              ),
-            ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Form( 
+            key: _formKey, 
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10.0),
+                CustomTextField(
+                  controller: _registrationController,
+                  labelText: 'Registration',
+                  hintText: 'Registration',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter plane Registration:ex: ZS-ABC';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 10.0),
+                CustomTextField(
+                  controller: _engineTypeController,
+                  labelText: 'Engine Type',
+                  hintText: 'Enter Engine type',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter plane engine type';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                CustomTextField(
+                  controller: _totalHoursController,
+                  labelText: 'Total Hours',
+                  hintText: 'Enter total hours on Plane',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter total hours';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () async {
+                        final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                        if (pickedFile != null) {
+                          setState(() {
+                            _imageFile = File(pickedFile.path);
+                          });
+                        }
+                      },
+                      child: const Text('Pick Image'),
+                    ),
+                    const SizedBox(width: 16.0),
+                    _imageFile != null
+                        ? Text(_imageFile!.path)
+                        : const Text('No image selected'),
+                  ],
+                ),
+                const SizedBox(height: 8.0),
+                MyButton(
+                  onTap: () async {
+                    if (_formKey.currentState!.validate()) { 
+                      String registration = _registrationController.text.trim();
+                      String engineType = _engineTypeController.text.trim();
+                      int totalHours = int.parse(_totalHoursController.text.trim());
+        
+                      widget.onAddPlane(
+                        registration: registration,
+                        engineType: engineType,
+                        totalHours: totalHours,
+                        imageFile: _imageFile,
+                      );
+                    }
+                  },
+                  description: "Add Plane",
+                ),
+              ],
+            ),
           ),
         ),
       ),
