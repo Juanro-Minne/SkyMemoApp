@@ -143,29 +143,53 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
                   },
                 ),
                 const SizedBox(height: 10),
-                Text('Takeoff Time: ${_formatDateTime(_selectedTakeoffTime)}'),
+                Text(
+                    style: const TextStyle(fontSize: 15),
+                    'Takeoff Time: ${_formatDateTime(_selectedTakeoffTime)}'),
                 ElevatedButton(
                   onPressed: () {
                     _showDateTimePicker(context);
                   },
+                  style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.all(10),
+                      backgroundColor: Colors.blueGrey,
+                      foregroundColor: const Color.fromARGB(255, 245, 228, 178),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8))),
                   child: const Text('Select Takeoff Time'),
                 ),
-                const SizedBox(height: 8.0),
-                MyButton(
-                  onTap: () {
-                    if (_formKey.currentState!.validate()) {
-                      widget.onLogFlight(
-                        takeoffLocation: _takeoffLocationController.text.trim(),
-                        destination: _destinationController.text.trim(),
-                        planeRegistration: _selectedPlaneRegistration!,
-                        flightTime:
-                            int.parse(_flightTimeController.text.trim()),
-                        flightDescription: _flightDescription.text.trim(),
-                        takeoffTime: _selectedTakeoffTime,
-                      );
-                    }
-                  },
-                  description: "Log flight",
+                const SizedBox(height: 2.0),
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: MyButton(
+                    onTap: () {
+                      if (_formKey.currentState!.validate()) {
+                        widget.onLogFlight(
+                          takeoffLocation:
+                              _takeoffLocationController.text.trim(),
+                          destination: _destinationController.text.trim(),
+                          planeRegistration: _selectedPlaneRegistration!,
+                          flightTime:
+                              int.parse(_flightTimeController.text.trim()),
+                          flightDescription: _flightDescription.text.trim(),
+                          takeoffTime: _selectedTakeoffTime,
+                        );
+                      }
+                    },
+                    description: "Log flight",
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: MyButton(
+                    onTap: () {
+                      _takeoffLocationController.clear();
+                      _destinationController.clear();
+                      _flightTimeController.clear();
+                      _flightDescription.clear();
+                    },
+                    description: "Clear",
+                  ),
                 ),
               ],
             ),
