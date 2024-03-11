@@ -57,9 +57,9 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else {
-        
-                      final uniqueRegistrations = snapshot.data!.toSet().toList();
-        
+                      final uniqueRegistrations =
+                          snapshot.data!.toSet().toList();
+
                       return DropdownButtonFormField<String>(
                         value: _selectedPlaneRegistration,
                         onChanged: (value) {
@@ -158,7 +158,8 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
                         takeoffLocation: _takeoffLocationController.text.trim(),
                         destination: _destinationController.text.trim(),
                         planeRegistration: _selectedPlaneRegistration!,
-                        flightTime: int.parse(_flightTimeController.text.trim()),
+                        flightTime:
+                            int.parse(_flightTimeController.text.trim()),
                         flightDescription: _flightDescription.text.trim(),
                         takeoffTime: _selectedTakeoffTime,
                       );
@@ -179,15 +180,20 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
   }
 
   Future<void> _showDateTimePicker(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+    final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
-      initialDate: _selectedTakeoffTime,
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2101),
+      initialTime: TimeOfDay.now(),
     );
-    if (picked != null && picked != _selectedTakeoffTime) {
+
+    if (pickedTime != null) {
       setState(() {
-        _selectedTakeoffTime = picked; // Update selected takeoff time
+        _selectedTakeoffTime = DateTime(
+          DateTime.now().year,
+          DateTime.now().month,
+          DateTime.now().day,
+          pickedTime.hour,
+          pickedTime.minute,
+        );
       });
     }
   }

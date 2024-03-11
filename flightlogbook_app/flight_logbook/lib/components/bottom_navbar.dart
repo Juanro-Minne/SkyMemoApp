@@ -22,18 +22,18 @@ class _BottomNavBarState extends State<BottomNavBar> with WidgetsBindingObserver
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   void didChangeMetrics() {
-    final bottomInset = WidgetsBinding.instance?.window.viewInsets.bottom ?? 0;
+    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
     setState(() {
       _isKeyboardVisible = bottomInset > 0;
     });
