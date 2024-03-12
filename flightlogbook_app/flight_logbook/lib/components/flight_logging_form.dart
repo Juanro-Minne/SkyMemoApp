@@ -151,7 +151,7 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
                     _showDateTimePicker(context);
                   },
                   style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
                       backgroundColor: Colors.blueGrey,
                       foregroundColor: const Color.fromARGB(255, 245, 228, 178),
                       shape: RoundedRectangleBorder(
