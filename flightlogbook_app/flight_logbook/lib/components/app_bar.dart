@@ -24,25 +24,25 @@ class _MyAppBarState extends State<MyAppBar> {
       elevation: 0,
       title: Row(
         children: [
-          Center(
-            child: Text(
-              widget.title.toUpperCase(),
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 3,
-              ),
+          Text(
+            widget.title.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 2,
             ),
           ),
         ],
       ),
-      actions: const [
+      actions: [
         Padding(
-            padding: EdgeInsets.all(20.0), child: Icon(Icons.account_circle)),
+          padding: const EdgeInsets.all(8.0),
+          child: UserProfileIcon(),
+        ),
       ],
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(8),
+          bottom: Radius.circular(10),
         ),
       ),
     );
@@ -61,7 +61,6 @@ class UserProfileIcon extends StatelessWidget {
     return PopupMenuButton<String>(
       onSelected: (value) {
         if (value == 'settings') {
-          // Handle Settings
         } else if (value == 'logout') {
           signUserOut();
         }
