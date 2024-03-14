@@ -16,7 +16,8 @@ class TabCustom extends StatelessWidget {
         child: Text(
           text,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 17,
+            color: Color.fromARGB(255, 70, 90, 100),
             fontWeight: FontWeight.bold,
           ),
         ),

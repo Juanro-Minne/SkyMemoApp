@@ -98,28 +98,27 @@ class _PlanesScreenState extends State<PlanesScreen>
     );
   }
 
- Future<List<Map<String, dynamic>>> _fetchPlanes() async {
-  try {
-    final userEmail = _auth.currentUser?.email;
-    if (userEmail != null) {
-      final querySnapshot = await FirebaseFirestore.instance
-          .collection('planes')
-          .where('userId', isEqualTo: userEmail)
-          .get();
-      final planes = querySnapshot.docs.map((doc) {
-        var planeData = doc.data();
-        planeData['planeId'] = doc.id;
-        return planeData;
-      }).toList();
-      return planes;
-    } else {
-      throw Exception('User email was not found');
+  Future<List<Map<String, dynamic>>> _fetchPlanes() async {
+    try {
+      final userEmail = _auth.currentUser?.email;
+      if (userEmail != null) {
+        final querySnapshot = await FirebaseFirestore.instance
+            .collection('planes')
+            .where('userId', isEqualTo: userEmail)
+            .get();
+        final planes = querySnapshot.docs.map((doc) {
+          var planeData = doc.data();
+          planeData['planeId'] = doc.id;
+          return planeData;
+        }).toList();
+        return planes;
+      } else {
+        throw Exception('User email was not found');
+      }
+    } catch (error) {
+      rethrow;
     }
-  } catch (error) {
-    rethrow;
   }
-}
-
 
   void _addPlane({
     required String registration,
@@ -171,95 +170,108 @@ class _PlanesScreenState extends State<PlanesScreen>
   }
 
   Widget _buildPlaneList() {
-  return SingleChildScrollView(
-    child: Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _fetchPlanes(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else {
-            final planes = snapshot.data!;
-            return ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: planes.length,
-              itemBuilder: (context, index) {
-                final plane = planes[index];
-                return Dismissible(
-                  key: Key(plane['planeId']), 
-                  onDismissed: (direction) {
-                    _deletePlane(plane['planeId']); // Pass planeId to delete
-                  },
-                  direction: DismissDirection.endToStart,
-                  background: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(20)),
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.only(right: 20.0),
-                    child: const Icon(
-                      Icons.delete,
-                      color: Colors.white,
+    return SingleChildScrollView(
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: FutureBuilder<List<Map<String, dynamic>>>(
+          future: _fetchPlanes(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else {
+              final planes = snapshot.data!;
+              return ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: planes.length,
+                itemBuilder: (context, index) {
+                  final plane = planes[index];
+                  return Dismissible(
+                    key: Key(plane['planeId']),
+                    onDismissed: (direction) {
+                      _deletePlane(plane['planeId']); // Pass planeId to delete
+                    },
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(20)),
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 20.0),
+                      child: const Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 5),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: const Color.fromARGB(255, 243, 202, 128),
-                    ),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.all(10),
-                      leading: plane['imageUrl'] != null
-                          ? Image.network(
-                              plane['imageUrl'],
-                              width: 50,
-                              height: 50,
-                            )
-                          : const SizedBox(
-                              width: 150,
-                              height: 200,
-                              child: Placeholder(),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 5),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: const Color.fromARGB(255, 220, 212, 197),
+                      ),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(10),
+                        leading: plane['imageUrl'] != null
+                            ? Image.network(
+                                plane['imageUrl'],
+                                width: 50,
+                                height: 50,
+                              )
+                            : const SizedBox(
+                                width: 150,
+                                height: 200,
+                                child: Placeholder(),
+                              ),
+                        title: const Text(
+                          "Plane Info:",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              decoration: TextDecoration.underline,
+                              fontSize: 19,
+                              color: Colors.black),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Plane Registration: ${plane['registration']}',
+                              style: const TextStyle(
+                                  fontSize: 16, color: Colors.black),
                             ),
-                      title: const Text(
-                        "Plane Info:",
-                        style: TextStyle(
-                            decoration: TextDecoration.underline,
-                            fontSize: 19,
-                            color: Colors.black),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                              'Plane Registration: ${plane['registration']}'),
-                          Text('Engine Type: ${plane['engineType']}'),
-                          Text('Total Hours: ${plane['totalHours']}'),
-                          const Text(
-                            'note: Swipe to delete flight',
-                            style: TextStyle(fontSize: 13, color: Colors.red),
-                          )
-                        ],
+                            Text(
+                              'Engine Type: ${plane['engineType']}',
+                              style: const TextStyle(
+                                  fontSize: 16, color: Colors.black),
+                            ),
+                            Text(
+                              'Total Hours: ${plane['totalHours']}',
+                              style: const TextStyle(
+                                  fontSize: 16, color: Colors.black),
+                            ),
+                            const Text(
+                              'note: Swipe left to Plane',
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: Color.fromARGB(255, 234, 80, 69)),
+                            )
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
-            );
-          }
-        },
+                  );
+                },
+              );
+            }
+          },
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Future<void> _deletePlane(String? planeId) async {
     try {

@@ -76,35 +76,54 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
                   },
                 ),
                 const SizedBox(height: 16.0),
-                Row(
-                  children: [
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blueGrey,
                           foregroundColor:
                               const Color.fromARGB(255, 245, 228, 178),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8))),
-                      onPressed: () async {
-                        final pickedFile = await ImagePicker()
-                            .pickImage(source: ImageSource.gallery);
-                        if (pickedFile != null) {
-                          setState(() {
-                            _imageFile = File(pickedFile.path);
-                          });
-                        }
-                      },
-                      child: const Text('Pick Image'),
-                    ),
-                    const SizedBox(width: 10.0),
-                    _imageFile != null
-                        ? Text(_imageFile!.path)
-                        : const Text('No image selected'),
-                  ],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () async {
+                          final pickedFile = await ImagePicker()
+                              .pickImage(source: ImageSource.gallery);
+                          if (pickedFile != null) {
+                            setState(() {
+                              _imageFile = File(pickedFile.path);
+                            });
+                          }
+                        },
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.cloud_upload),
+                            SizedBox(width: 15),
+                            Text('Upload Image here',
+                                style: TextStyle(fontSize: 15)),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 15.0),
+                      _imageFile != null
+                          ? Text(_imageFile!.path)
+                          : const Text('No image selected',
+                              style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 20.0),
+                const Divider(
+                  color: Colors.blueGrey,
+                  thickness: 1,
+                ),
+                const SizedBox(height: 15.0),
                 Padding(
-                  padding: const EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(8),
                   child: MyButton(
                     onTap: () async {
                       if (_formKey.currentState!.validate()) {
@@ -126,7 +145,7 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(8),
                   child: MyButton(
                     onTap: () {
                       _engineTypeController.clear();

@@ -143,24 +143,45 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
                   },
                 ),
                 const SizedBox(height: 10),
-                Text(
-                    style: const TextStyle(fontSize: 15),
-                    'Takeoff Time: ${_formatDateTime(_selectedTakeoffTime)}'),
-                ElevatedButton(
-                  onPressed: () {
-                    _showDateTimePicker(context);
-                  },
-                  style: ElevatedButton.styleFrom(
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _showDateTimePicker(context);
+                    },
+                    style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(10),
                       backgroundColor: Colors.blueGrey,
                       foregroundColor: const Color.fromARGB(255, 245, 228, 178),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8))),
-                  child: const Text('Select Takeoff Time'),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.access_time),
+                        SizedBox(width: 12),
+                        Text(
+                          'Select Takeoff Time',
+                          style: TextStyle(fontSize: 15),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Center(
+                  child: Text(
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
+                      'Takeoff Time: ${_formatDateTime(_selectedTakeoffTime)}'),
+                ),
+                const Divider(
+                  color: Colors.blueGrey,
+                  thickness: 1,
                 ),
                 const SizedBox(height: 2.0),
                 Padding(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(5),
                   child: MyButton(
                     onTap: () {
                       if (_formKey.currentState!.validate()) {
@@ -180,7 +201,7 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(5),
                   child: MyButton(
                     onTap: () {
                       _takeoffLocationController.clear();

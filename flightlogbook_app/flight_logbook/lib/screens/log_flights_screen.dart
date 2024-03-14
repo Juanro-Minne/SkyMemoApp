@@ -19,7 +19,8 @@ class FlightData {
     required this.destination,
     required this.flightTime,
     required this.flightDescription,
-    required Timestamp takeoffTime, required id,
+    required Timestamp takeoffTime,
+    required id,
   }) : takeoffTime = takeoffTime.toDate();
 }
 
@@ -73,8 +74,7 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
                       indicatorSize: TabBarIndicatorSize.label,
                       indicatorWeight: 5,
                       indicator: BoxDecoration(
-                        color: const Color.fromARGB(255, 219, 219,
-                            219),
+                        color: const Color.fromARGB(255, 219, 219, 219),
                         borderRadius: BorderRadius.circular(5),
                       ),
                       controller: _tabController,
@@ -108,84 +108,102 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
     );
   }
 
- Widget _buildFlightList() {
-  return Container(
-    padding: const EdgeInsets.all(10),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: FutureBuilder<List<Map<String, dynamic>>>(
-      future: _fetchFlights(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: LinearProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else {
-          final flights = snapshot.data!;
-          return ListView.builder(
-            itemCount: flights.length,
-            itemBuilder: (context, index) {
-              final flight = flights[index];
-              return Dismissible(
-                key: Key(flight['id']),
-                direction: DismissDirection.endToStart,
-                background: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.red,
+  Widget _buildFlightList() {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _fetchFlights(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: LinearProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else {
+            final flights = snapshot.data!;
+            return ListView.builder(
+              itemCount: flights.length,
+              itemBuilder: (context, index) {
+                final flight = flights[index];
+                return Dismissible(
+                  key: Key(flight['id']),
+                  direction: DismissDirection.endToStart,
+                  background: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: const Color.fromARGB(255, 220, 93, 84),
+                    ),
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: const Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Icon(Icons.delete, color: Colors.white),
+                    ),
                   ),
-                  alignment: AlignmentDirectional.centerEnd,
-                  child: const Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Icon(Icons.delete, color: Colors.white),
-                  ),
-                ),
-                onDismissed: (direction) {
-                  _deleteFlight(flight['id']); // Call delete function
-                },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: const Color.fromARGB(255, 220, 212, 197),
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(10),
-                    title: Text(
-                      'Flight ${index + 1}',
-                      style: const TextStyle(
-                        decoration: TextDecoration.underline,
-                        fontSize: 19,
-                        color: Colors.black,
+                  onDismissed: (direction) {
+                    _deleteFlight(flight['id']);
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: const Color.fromARGB(255, 220, 212, 197),
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(8),
+                      title: Text(
+                        'Flight number: ${index + 1}',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            decoration: TextDecoration.underline,
+                            fontSize: 18,
+                            color: Colors.black),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Takeoff Location: ${flight['takeoffLocation']}',
+                            style: const TextStyle(
+                                fontSize: 17, color: Colors.black),
+                          ),
+                          Text(
+                            'Destination: ${flight['destination']}',
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.black),
+                          ),
+                          Text(
+                            'Flight Time in hours: ${flight['flightTime']}',
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.black),
+                          ),
+                          Text(
+                            'Flight Description: ${flight['flightDescription']}',
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.black),
+                          ),
+                          Text(
+                            'Takeoff Time: ${_formatDateTime(flight['takeoffTime'].toDate())}',
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.black),
+                          ),
+                          const Text(
+                            'note: Swipe left delete flight',
+                            style: TextStyle(fontSize: 13, color: Colors.red),
+                          )
+                        ],
                       ),
                     ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Takeoff Location: ${flight['takeoffLocation']}'),
-                        Text('Destination: ${flight['destination']}'),
-                        Text('Flight Time (hours): ${flight['flightTime']}'),
-                        Text('Flight Description: ${flight['flightDescription']}'),
-                        Text('Takeoff Time: ${_formatDateTime(flight['takeoffTime'].toDate())}'),
-
-                        const Text(
-                          'note: Swipe to delete flight',
-                          style: TextStyle(fontSize: 13, color: Colors.red),
-                        )
-                      ],
-                    ),
                   ),
-                ),
-              );
-            },
-          );
-        }
-      },
-    ),
-  );
-}
-
+                );
+              },
+            );
+          }
+        },
+      ),
+    );
+  }
 
   Future<void> _deleteFlight(String flightId) async {
     try {
@@ -232,27 +250,27 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
   }
 
   Future<List<Map<String, dynamic>>> _fetchFlights() async {
-  try {
-    final userEmail = _auth.currentUser?.email;
-    if (userEmail != null) {
-      final querySnapshot = await FirebaseFirestore.instance
-          .collection('flights')
-          .where('userId', isEqualTo: userEmail)
-          .get();
+    try {
+      final userEmail = _auth.currentUser?.email;
+      if (userEmail != null) {
+        final querySnapshot = await FirebaseFirestore.instance
+            .collection('flights')
+            .where('userId', isEqualTo: userEmail)
+            .get();
 
-      final flights = querySnapshot.docs.map((doc) {
-        Map<String, dynamic> flightData = doc.data();
-        flightData['id'] = doc.id;
-        return flightData;
-      }).toList();
-      return flights;
-    } else {
-      throw Exception('User email was not found');
+        final flights = querySnapshot.docs.map((doc) {
+          Map<String, dynamic> flightData = doc.data();
+          flightData['id'] = doc.id;
+          return flightData;
+        }).toList();
+        return flights;
+      } else {
+        throw Exception('User email was not found');
+      }
+    } catch (error) {
+      rethrow;
     }
-  } catch (error) {
-    rethrow;
   }
-}
 
   void _logFlight({
     required String takeoffLocation,
