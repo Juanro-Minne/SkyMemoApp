@@ -24,25 +24,25 @@ class _MyAppBarState extends State<MyAppBar> {
       elevation: 0,
       title: Row(
         children: [
-          Text(
-            widget.title.toUpperCase(), // Dynamically set the title
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
+          Center(
+            child: Text(
+              widget.title.toUpperCase(),
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 3,
+              ),
             ),
           ),
         ],
       ),
-      actions: [
+      actions: const [
         Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: UserProfileIcon(),
-        ),
+            padding: EdgeInsets.all(20.0), child: Icon(Icons.account_circle)),
       ],
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(10), // Adjust radius as needed
+          bottom: Radius.circular(8),
         ),
       ),
     );
@@ -86,11 +86,10 @@ class UserProfileIcon extends StatelessWidget {
       },
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Icon(user != null ? Icons.person : Icons.person_outline), // Fix the null check
+        child: Icon(user != null
+            ? Icons.person
+            : Icons.person_outline), // Fix the null check
       ),
     );
   }
 }
-
-
-
