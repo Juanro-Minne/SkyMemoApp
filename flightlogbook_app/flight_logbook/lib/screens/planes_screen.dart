@@ -155,6 +155,7 @@ class _PlanesScreenState extends State<PlanesScreen>
       _engineTypeController.clear();
       _totalHoursController.clear();
       _imageUrlController.clear();
+      _imageUrlController.clear();
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Plane added successfully')),
@@ -170,22 +171,28 @@ class _PlanesScreenState extends State<PlanesScreen>
   }
 
   Widget _buildPlaneList() {
-    return SingleChildScrollView(
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: FutureBuilder<List<Map<String, dynamic>>>(
-          future: _fetchPlanes(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            } else {
-              final planes = snapshot.data!;
-              return ListView.builder(
+  return FutureBuilder<List<Map<String, dynamic>>>(
+    future: _fetchPlanes(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (snapshot.hasError) {
+        return Center(child: Text('Error: ${snapshot.error}'));
+      } else {
+        final planes = snapshot.data!;
+        return RefreshIndicator(
+          onRefresh: () async {
+
+            setState(() {
+            });
+          },
+          child: SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: planes.length,
@@ -194,13 +201,14 @@ class _PlanesScreenState extends State<PlanesScreen>
                   return Dismissible(
                     key: Key(plane['planeId']),
                     onDismissed: (direction) {
-                      _deletePlane(plane['planeId']); // Pass planeId to delete
+                      _deletePlane(plane['planeId']);
                     },
                     direction: DismissDirection.endToStart,
                     background: Container(
                       decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(20)),
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                       alignment: Alignment.centerRight,
                       padding: const EdgeInsets.only(right: 20.0),
                       child: const Icon(
@@ -230,10 +238,11 @@ class _PlanesScreenState extends State<PlanesScreen>
                         title: const Text(
                           "Plane Info:",
                           style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              decoration: TextDecoration.underline,
-                              fontSize: 19,
-                              color: Colors.black),
+                            fontWeight: FontWeight.w500,
+                            decoration: TextDecoration.underline,
+                            fontSize: 19,
+                            color: Colors.black,
+                          ),
                         ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,37 +250,46 @@ class _PlanesScreenState extends State<PlanesScreen>
                             Text(
                               'Plane Registration: ${plane['registration']}',
                               style: const TextStyle(
-                                  fontSize: 16, color: Colors.black),
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
                             ),
                             Text(
                               'Engine Type: ${plane['engineType']}',
                               style: const TextStyle(
-                                  fontSize: 16, color: Colors.black),
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
                             ),
                             Text(
                               'Total Hours: ${plane['totalHours']}',
                               style: const TextStyle(
-                                  fontSize: 16, color: Colors.black),
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
                             ),
                             const Text(
                               'note: Swipe left to Plane',
                               style: TextStyle(
-                                  fontSize: 13,
-                                  color: Color.fromARGB(255, 234, 80, 69)),
-                            )
+                                fontSize: 13,
+                                color: Color.fromARGB(255, 234, 80, 69),
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
                   );
                 },
-              );
-            }
-          },
-        ),
-      ),
-    );
-  }
+              ),
+            ),
+          ),
+        );
+      }
+    },
+  );
+}
+
 
   Future<void> _deletePlane(String? planeId) async {
     try {
