@@ -121,54 +121,86 @@ class _PlanesScreenState extends State<PlanesScreen>
   }
 
   void _addPlane({
-    required String registration,
-    required String engineType,
-    required int totalHours,
-    File? imageFile,
-  }) async {
-    try {
-      String? imageURL;
-      if (imageFile != null) {
-        String imageFileName = DateTime.now().millisecondsSinceEpoch.toString();
-        firebase_storage.Reference ref = firebase_storage
-            .FirebaseStorage.instance
-            .ref()
-            .child('plane_images')
-            .child('$imageFileName.jpg');
-        await ref.putFile(imageFile);
-        imageURL = await ref.getDownloadURL();
-      }
+  required String registration,
+  required String engineType,
+  required int totalHours,
+  File? imageFile,
+}) async {
+  try {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const AlertDialog(
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 20),
+            Text("Adding plane..."),
+          ],
+        ),
+      ),
+    );
 
-      User? user = _auth.currentUser;
-      String? userEmail = user?.email;
-
-      if (userEmail != null) {
-        await _firestore.collection('planes').add({
-          'userId': userEmail,
-          'registration': registration,
-          'engineType': engineType,
-          'totalHours': totalHours,
-          if (imageURL != null) 'imageUrl': imageURL,
-        });
-      }
-      _registrationController.clear();
-      _engineTypeController.clear();
-      _totalHoursController.clear();
-      _imageUrlController.clear();
-      _imageUrlController.clear();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Plane added successfully')),
-      );
-    } catch (e) {
+    final QuerySnapshot existingPlanes = await _firestore
+        .collection('planes')
+        .where('registration', isEqualTo: registration)
+        .get();
+    if (existingPlanes.docs.isNotEmpty) {
+      Navigator.of(context).pop(); 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.redAccent.withOpacity(0.7),
-          content: Text('Failed to add plane: $e'),
+          content: Text('Plane with registration $registration already exists.'),
         ),
       );
+      return;
     }
+
+    String? imageURL;
+    if (imageFile != null) {
+      String imageFileName = DateTime.now().millisecondsSinceEpoch.toString();
+      firebase_storage.Reference ref = firebase_storage
+          .FirebaseStorage.instance
+          .ref()
+          .child('plane_images')
+          .child('$imageFileName.jpg');
+      await ref.putFile(imageFile);
+      imageURL = await ref.getDownloadURL();
+    }
+
+    User? user = _auth.currentUser;
+    String? userEmail = user?.email;
+
+    if (userEmail != null) {
+      await _firestore.collection('planes').add({
+        'userId': userEmail,
+        'registration': registration,
+        'engineType': engineType,
+        'totalHours': totalHours,
+        if (imageURL != null) 'imageUrl': imageURL,
+      });
+    }
+
+    _registrationController.clear();
+    _engineTypeController.clear();
+    _totalHoursController.clear();
+    _imageUrlController.clear();
+
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Plane added successfully')),
+    );
+  } catch (e) {
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.redAccent.withOpacity(0.7),
+        content: Text('Failed to add plane: $e'),
+      ),
+    );
   }
+}
+
 
   Widget _buildPlaneList() {
   return FutureBuilder<List<Map<String, dynamic>>>(
