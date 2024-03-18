@@ -143,6 +143,7 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
                   ),
                   onDismissed: (direction) {
                     _deleteFlight(flight['id']);
+                    setState(() {});
                   },
                   child: Container(
                     margin: const EdgeInsets.symmetric(vertical: 5),
@@ -151,7 +152,7 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
                       color: const Color.fromARGB(255, 220, 212, 197),
                     ),
                     child: ListTile(
-                      contentPadding: const EdgeInsets.all(8),
+                      contentPadding: const EdgeInsets.all(20),
                       title: Text(
                         'Flight number: ${index + 1}',
                         style: const TextStyle(
@@ -185,6 +186,11 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
                           ),
                           Text(
                             'Takeoff Time: ${_formatDateTime(flight['takeoffTime'].toDate())}',
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.black),
+                          ),
+                          Text(
+                            'Plane Registartion: ${flight['planeRegistration']}',
                             style: const TextStyle(
                                 fontSize: 16, color: Colors.black),
                           ),

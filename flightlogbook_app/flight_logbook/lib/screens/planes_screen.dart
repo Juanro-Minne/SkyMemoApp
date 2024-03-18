@@ -121,207 +121,233 @@ class _PlanesScreenState extends State<PlanesScreen>
   }
 
   void _addPlane({
-  required String registration,
-  required String engineType,
-  required int totalHours,
-  File? imageFile,
-}) async {
-  try {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const AlertDialog(
-        content: Row(
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 20),
-            Text("Adding plane..."),
-          ],
+    required String registration,
+    required String engineType,
+    required int totalHours,
+    File? imageFile,
+  }) async {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const AlertDialog(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text("Adding plane..."),
+            ],
+          ),
         ),
-      ),
-    );
+      );
 
-    final QuerySnapshot existingPlanes = await _firestore
-        .collection('planes')
-        .where('registration', isEqualTo: registration)
-        .get();
-    if (existingPlanes.docs.isNotEmpty) {
-      Navigator.of(context).pop(); 
+      final QuerySnapshot existingPlanes = await _firestore
+          .collection('planes')
+          .where('registration', isEqualTo: registration)
+          .get();
+      if (existingPlanes.docs.isNotEmpty) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.redAccent.withOpacity(0.7),
+            content:
+                Text('Plane with registration $registration already exists.'),
+          ),
+        );
+        return;
+      }
+
+      String? imageURL;
+      if (imageFile != null) {
+        String imageFileName = DateTime.now().millisecondsSinceEpoch.toString();
+        firebase_storage.Reference ref = firebase_storage
+            .FirebaseStorage.instance
+            .ref()
+            .child('plane_images')
+            .child('$imageFileName.jpg');
+        await ref.putFile(imageFile);
+        imageURL = await ref.getDownloadURL();
+      }
+
+      User? user = _auth.currentUser;
+      String? userEmail = user?.email;
+
+      if (userEmail != null) {
+        await _firestore.collection('planes').add({
+          'userId': userEmail,
+          'registration': registration,
+          'engineType': engineType,
+          'totalHours': totalHours,
+          if (imageURL != null) 'imageUrl': imageURL,
+        });
+      }
+
+      _registrationController.clear();
+      _engineTypeController.clear();
+      _totalHoursController.clear();
+      _imageUrlController.clear();
+
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Plane added successfully')),
+      );
+    } catch (e) {
+      Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.redAccent.withOpacity(0.7),
-          content: Text('Plane with registration $registration already exists.'),
+          content: Text('Failed to add plane: $e'),
         ),
       );
-      return;
     }
-
-    String? imageURL;
-    if (imageFile != null) {
-      String imageFileName = DateTime.now().millisecondsSinceEpoch.toString();
-      firebase_storage.Reference ref = firebase_storage
-          .FirebaseStorage.instance
-          .ref()
-          .child('plane_images')
-          .child('$imageFileName.jpg');
-      await ref.putFile(imageFile);
-      imageURL = await ref.getDownloadURL();
-    }
-
-    User? user = _auth.currentUser;
-    String? userEmail = user?.email;
-
-    if (userEmail != null) {
-      await _firestore.collection('planes').add({
-        'userId': userEmail,
-        'registration': registration,
-        'engineType': engineType,
-        'totalHours': totalHours,
-        if (imageURL != null) 'imageUrl': imageURL,
-      });
-    }
-
-    _registrationController.clear();
-    _engineTypeController.clear();
-    _totalHoursController.clear();
-    _imageUrlController.clear();
-
-    Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Plane added successfully')),
-    );
-  } catch (e) {
-    Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.redAccent.withOpacity(0.7),
-        content: Text('Failed to add plane: $e'),
-      ),
-    );
   }
-}
-
 
   Widget _buildPlaneList() {
-  return FutureBuilder<List<Map<String, dynamic>>>(
-    future: _fetchPlanes(),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const Center(child: CircularProgressIndicator());
-      } else if (snapshot.hasError) {
-        return Center(child: Text('Error: ${snapshot.error}'));
-      } else {
-        final planes = snapshot.data!;
-        return RefreshIndicator(
-          onRefresh: () async {
-
-            setState(() {
-            });
-          },
-          child: SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: planes.length,
-                itemBuilder: (context, index) {
-                  final plane = planes[index];
-                  return Dismissible(
-                    key: Key(plane['planeId']),
-                    onDismissed: (direction) {
-                      _deletePlane(plane['planeId']);
-                    },
-                    direction: DismissDirection.endToStart,
-                    background: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(20),
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: _fetchPlanes(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else {
+          final planes = snapshot.data!;
+          return RefreshIndicator(
+            onRefresh: () async {
+              setState(() {});
+            },
+            child: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: planes.length,
+                  itemBuilder: (context, index) {
+                    final plane = planes[index];
+                    return Dismissible(
+                      key: Key(plane['planeId']),
+                      onDismissed: (direction) {
+                        _deletePlane(plane['planeId']);
+                        setState(() {});
+                      },
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 20.0),
+                        child: const Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        ),
                       ),
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: 20.0),
-                      child: const Icon(
-                        Icons.delete,
-                        color: Colors.white,
-                      ),
-                    ),
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 5),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: const Color.fromARGB(255, 220, 212, 197),
-                      ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(10),
-                        leading: plane['imageUrl'] != null
-                            ? Image.network(
-                                plane['imageUrl'],
-                                width: 50,
-                                height: 50,
-                              )
-                            : const SizedBox(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 5),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: const Color.fromARGB(255, 220, 212, 197),
+                        ),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.all(5),
+                          leading: Stack(
+                            children: [
+                              SizedBox(
                                 width: 150,
                                 height: 200,
-                                child: Placeholder(),
+                                child: plane['imageUrl'] != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(5),
+                                        child: Image.network(
+                                          plane['imageUrl'],
+                                          width: 100,
+                                          height: 200,
+                                          fit: BoxFit.cover,
+                                          loadingBuilder: (BuildContext context,
+                                              Widget child,
+                                              ImageChunkEvent?
+                                                  loadingProgress) {
+                                            if (loadingProgress == null) {
+                                              return child;
+                                            }
+                                            return Center(
+                                              child: CircularProgressIndicator(
+                                                value: loadingProgress
+                                                            .expectedTotalBytes !=
+                                                        null
+                                                    ? loadingProgress
+                                                            .cumulativeBytesLoaded /
+                                                        loadingProgress
+                                                            .expectedTotalBytes!
+                                                    : null,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      )
+                                    : const Placeholder(),
                               ),
-                        title: const Text(
-                          "Plane Info:",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            decoration: TextDecoration.underline,
-                            fontSize: 19,
-                            color: Colors.black,
+                            ],
+                          ),
+                          title: const Text(
+                            "Plane Info:",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              decoration: TextDecoration.underline,
+                              fontSize: 19,
+                              color: Colors.black,
+                            ),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Plane Registration: ${plane['registration']}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              Text(
+                                'Engine Type: ${plane['engineType']}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              Text(
+                                'Total Hours: ${plane['totalHours']}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              const Text(
+                                'note: Swipe left to Plane',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Color.fromARGB(255, 234, 80, 69),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Plane Registration: ${plane['registration']}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Text(
-                              'Engine Type: ${plane['engineType']}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Text(
-                              'Total Hours: ${plane['totalHours']}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const Text(
-                              'note: Swipe left to Plane',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Color.fromARGB(255, 234, 80, 69),
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-        );
-      }
-    },
-  );
-}
-
+          );
+        }
+      },
+    );
+  }
 
   Future<void> _deletePlane(String? planeId) async {
     try {
