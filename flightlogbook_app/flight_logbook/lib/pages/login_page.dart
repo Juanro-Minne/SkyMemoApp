@@ -52,6 +52,7 @@ class _LoginPageState extends State<LoginPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: Colors.greenAccent,
+          duration: Duration (seconds: 3),
           content: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

@@ -354,7 +354,11 @@ class _PlanesScreenState extends State<PlanesScreen>
       if (planeId != null) {
         await _firestore.collection('planes').doc(planeId).delete();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Plane deleted successfully')),
+          const SnackBar(
+            content: Text('Plane deleted successfully'),
+            backgroundColor: Color.fromARGB(255, 105, 123, 240),
+            duration: Duration(seconds: 3),
+          ),
         );
       }
     } catch (e) {

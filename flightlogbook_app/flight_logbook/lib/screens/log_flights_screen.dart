@@ -215,7 +215,11 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
     try {
       await _firestore.collection('flights').doc(flightId).delete();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Flight deleted successfully')),
+        const SnackBar(
+          content: Text('Flight deleted successfully'),
+          backgroundColor: Color.fromARGB(255, 105, 123, 240),
+          duration: Duration(seconds: 3),
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -317,7 +321,11 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
           _flightTimeController.clear();
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Flight logged successfully')),
+            const SnackBar(
+              content: Text('Flight logged successfully'),
+              backgroundColor: Color.fromARGB(255, 105, 123, 240),
+              duration: Duration(seconds: 3),
+            ),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
