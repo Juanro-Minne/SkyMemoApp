@@ -17,7 +17,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   late DateTime _expiryDate = DateTime.now();
-  late PlatformFile? _selectedFile = null;
+  PlatformFile? _selectedFile;
 
   Future<void> _selectExpiryDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
@@ -40,7 +40,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         setState(() {
           _selectedFile = result.files.first;
         });
-      } else {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -50,55 +49,66 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   }
 
   Future<void> _uploadDocument() async {
-    try {
-      if (_selectedFile != null) {
-        final file = _selectedFile!;
-        final fileName = file.name;
-        final fileBytes = file.bytes;
+  try {
+    if (_selectedFile != null) {
+      final file = _selectedFile!;
+      final fileName = file.name;
+      final fileBytes = file.bytes;
+      if (fileBytes != null) { 
         final reference = FirebaseStorage.instance.ref('documents/$fileName');
-        final uploadTask = reference.putData(fileBytes!);
-        await uploadTask.whenComplete(() async {
-          User? user = _auth.currentUser;
-          if (user != null) {
-            String downloadUrl = await reference.getDownloadURL();
-            await _firestore.collection('documents').add({
-              'fileName': fileName,
-              'fileUrl': downloadUrl,
-              'expiryDate': Timestamp.fromDate(_expiryDate),
-              'userId': user.uid,
-            });
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Document uploaded successfully'),
-                backgroundColor: Color.fromARGB(255, 105, 123, 240),
-                duration: Duration(seconds: 3),
-              ),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('User is not logged in'),
-                backgroundColor: Color.fromARGB(255, 231, 85, 85),
-                duration: Duration(seconds: 3),
-              ),
-            );
-          }
-        });
+        final uploadTask = reference.putData(fileBytes);
+        final TaskSnapshot uploadSnapshot = await uploadTask;
+        final downloadUrl = await uploadSnapshot.ref.getDownloadURL();
+
+        User? user = _auth.currentUser;
+        if (user != null) {
+          await _firestore.collection('documents').add({
+            'fileName': fileName,
+            'fileUrl': downloadUrl,
+            'expiryDate': Timestamp.fromDate(_expiryDate),
+            'userId': user.uid,
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Document uploaded successfully'),
+              backgroundColor: Color.fromARGB(255, 105, 123, 240),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('User is not logged in'),
+              backgroundColor: Color.fromARGB(255, 231, 85, 85),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Please select a file to upload'),
+            content: Text('File bytes are null'),
             backgroundColor: Color.fromARGB(255, 231, 85, 85),
             duration: Duration(seconds: 3),
           ),
         );
       }
-    } catch (e) {
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error uploading document: $e')),
+        const SnackBar(
+          content: Text('Please select a file to upload'),
+          backgroundColor: Color.fromARGB(255, 231, 85, 85),
+          duration: Duration(seconds: 3),
+        ),
       );
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error uploading document: $e')),
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +128,18 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               onTap: () => _selectExpiryDate(context),
               description: 'Select Expiry Date',
             ),
-            const SizedBox(height: 20),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  'Expiry Date: ${_expiryDate.day}/${_expiryDate.month}/${_expiryDate.year}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+            ),
             MyButton(
               onTap: _uploadDocument,
               description: 'Upload Document',
@@ -132,14 +153,14 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                   color: Colors.black87,
                 ),
               ),
+            MyButton(
+                onTap: () {
+                  setState(() {
+                    _selectedFile = null;
+                  });
+                },
+                description: 'Clear File'),
             const SizedBox(height: 20),
-            Text(
-              'Expiry Date: ${_expiryDate.day}/${_expiryDate.month}/${_expiryDate.year}',
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black87,
-              ),
-            ),
           ],
         ),
       ),
