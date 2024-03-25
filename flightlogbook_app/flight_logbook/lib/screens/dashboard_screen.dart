@@ -14,7 +14,8 @@ class DashboardScreen extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator(); // Show loading indicator while fetching data
         } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}'); // Show error if fetching data fails
+          return Text(
+              'Error: ${snapshot.error}'); // Show error if fetching data fails
         } else {
           final lastFlightTime = snapshot.data;
 
@@ -28,7 +29,8 @@ class DashboardScreen extends StatelessWidget {
                     const SizedBox(height: 10),
                     const Text(
                       "Welcome Back !",
-                      style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 20),
                     const Row(
@@ -52,8 +54,11 @@ class DashboardScreen extends StatelessWidget {
                       children: [
                         DataTile(
                           title: "Last Flight Time",
-                          value: lastFlightTime != null ? "$lastFlightTime" : "N/A",
-                          backgroundColor: const Color.fromARGB(255, 129, 129, 129),
+                          value: lastFlightTime != null
+                              ? "$lastFlightTime"
+                              : "N/A",
+                          backgroundColor:
+                              const Color.fromARGB(255, 129, 129, 129),
                         ),
                         const DataTile(
                           title: "Prop hours",
@@ -61,6 +66,39 @@ class DashboardScreen extends StatelessWidget {
                           backgroundColor: Color.fromARGB(255, 129, 129, 129),
                         ),
                       ],
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const Divider(
+                      color: Colors.blueGrey,
+                      thickness: 2,
+                    ),
+                    const Row(
+                      children: [
+                        Center(
+                          child: Icon(
+                            Icons.warning,
+                            color: Color.fromARGB(255, 215, 66, 66),
+                            size: 24,
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Center(
+                          child: Text(
+                            "Expiration Warnings:",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 19,
+                              color: Color.fromARGB(255, 0, 0, 0),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Divider(
+                      color: Colors.blueGrey,
+                      thickness: 2,
                     ),
                   ],
                 ),
@@ -73,16 +111,15 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Future<int?> getLastFlightTime() async {
-
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
       try {
         QuerySnapshot querySnapshot = await FirebaseFirestore.instance
             .collection('flights')
-            .where('userId', isEqualTo: user) 
-            .orderBy('flightTime', descending: true) 
-            .limit(1) 
+            .where('userId', isEqualTo: user)
+            .orderBy('flightTime', descending: true)
+            .limit(1)
             .get();
 
         if (querySnapshot.docs.isNotEmpty) {
