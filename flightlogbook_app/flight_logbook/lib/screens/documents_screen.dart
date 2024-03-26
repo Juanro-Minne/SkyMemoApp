@@ -1,11 +1,13 @@
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../components/custom_button.dart';
 
 class DocumentsScreen extends StatefulWidget {
@@ -55,7 +57,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         final file = File(_selectedFile!.path!);
         List<int> bytes = await file.readAsBytes();
         _updateSelectedFileBytes(bytes);
-        print('File Bytes: $_selectedFileBytes');
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -83,7 +84,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
 
         User? user = _auth.currentUser;
         if (user != null) {
-          // Use user's email as the user ID
           await _firestore.collection('documents').add({
             'fileName': fileName,
             'fileUrl': downloadUrl,
@@ -97,12 +97,10 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               duration: Duration(seconds: 3),
             ),
           );
-          // Clear selected file after uploading
           setState(() {
             _selectedFile = null;
             _selectedFileBytes = [];
           });
-          // Fetch the updated list of documents after uploading
           _fetchUserDocuments();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -144,7 +142,29 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         });
       }
     } catch (e) {
-      print('Error fetching user documents: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching documents: $e')),
+      );
+    }
+  }
+
+  Future<void> _downloadFile(String fileName) async {
+    try {
+      String downloadUrl = '';
+      if (await canLaunch(downloadUrl)) {
+        await launch(downloadUrl);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not launch download URL'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error downloading file: $e')),
+      );
     }
   }
 
@@ -152,28 +172,52 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: 2),
+            const Padding(
+              padding: EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  'Please select a file',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Color.fromARGB(255, 49, 67, 76),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
             MyButton(
               onTap: _selectFile,
               description: 'Select File',
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
+            const Center(
+              child: Text(
+                'Please select a expiry date',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Color.fromARGB(255, 49, 67, 76),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             MyButton(
               onTap: () => _selectExpiryDate(context),
               description: 'Select Expiry Date',
             ),
             Padding(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
                   'Expiry Date: ${_expiryDate.day}/${_expiryDate.month}/${_expiryDate.year}',
                   style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black87,
+                    fontSize: 18,
+                    color: Color.fromARGB(255, 49, 67, 76),
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -182,13 +226,39 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               onTap: _uploadDocument,
               description: 'Upload Document',
             ),
-            const SizedBox(height: 20),
+            const Divider(
+              color: Colors.blueGrey,
+              thickness: 2,
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'User Documents:',
+              style: TextStyle(
+                fontSize: 20,
+                color: Color.fromARGB(255, 49, 67, 76),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
             ListView.builder(
               shrinkWrap: true,
-              itemCount:_documentNames.length,
+              itemCount: _documentNames.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(_documentNames[index]),
+                return Card(
+                  elevation: 4,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: ListTile(
+                    title: Text(_documentNames[index]),
+                    leading: IconButton(
+                      icon: const Icon(Icons.file_download),
+                      onPressed: () {
+                        _downloadFile(_documentNames[index]);
+                      },
+                    ),
+                  ),
                 );
               },
             ),
