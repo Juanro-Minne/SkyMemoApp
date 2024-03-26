@@ -138,7 +138,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             .where('userId', isEqualTo: user.email)
             .get();
         setState(() {
-          // Process and display user's document names
           _documentNames = userDocsSnapshot.docs
               .map<String>((doc) => doc['fileName'] as String)
               .toList();
