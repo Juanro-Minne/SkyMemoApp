@@ -29,7 +29,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch the list of documents when the screen is initialized
     _fetchUserDocuments();
   }
 
