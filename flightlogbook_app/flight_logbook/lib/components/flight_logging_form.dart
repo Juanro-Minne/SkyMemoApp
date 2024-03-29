@@ -98,7 +98,7 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
                 CustomTextField(
                   controller: _takeoffLocationController,
                   labelText: 'Takeoff Location',
-                  hintText: 'Enter location',
+                  hintText: 'Enter takeoff location',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter takeoff location';

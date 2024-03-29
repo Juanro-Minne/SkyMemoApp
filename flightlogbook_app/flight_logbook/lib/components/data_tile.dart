@@ -15,6 +15,7 @@ class DataTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Card(
+        color: backgroundColor,
         child: Padding(
           padding: const EdgeInsets.all(25.0),
           child: Column(
@@ -22,11 +23,12 @@ class DataTile extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
               Text(
                 value,
-                style: const TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 15),
               ),
             ],
           ),

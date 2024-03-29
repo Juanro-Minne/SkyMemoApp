@@ -10,7 +10,7 @@ import '../components/tab.dart';
 class FlightData {
   final String takeoffLocation;
   final String destination;
-  final int flightTime;
+  final double flightTime;
   final String flightDescription;
   final DateTime takeoffTime;
 
@@ -324,7 +324,7 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
             const SnackBar(
               content: Text('Flight logged successfully'),
               backgroundColor: Color.fromARGB(255, 105, 123, 240),
-              duration: Duration(seconds: 3),
+              duration: Duration(seconds: 2),
             ),
           );
         } else {

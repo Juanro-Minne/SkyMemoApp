@@ -71,6 +71,8 @@ flutter:
   assets:
     - lib/images/plane-icon.png
     - lib/images/
+    - lib/images/backround.jpg
+    - lib/images/backround2.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
