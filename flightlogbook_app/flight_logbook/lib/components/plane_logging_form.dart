@@ -77,7 +77,7 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
                 ),
                 const SizedBox(height: 16.0),
                 Center(
-                  child: Column(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton(
@@ -108,12 +108,15 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 15.0),
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: SizedBox(height: 15.0),
+                      ),
                       _imageFile != null
                           ? Text(_imageFile!.path)
                           : const Text('No image selected',
                               style: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.bold)),
+                                  fontSize: 12, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),

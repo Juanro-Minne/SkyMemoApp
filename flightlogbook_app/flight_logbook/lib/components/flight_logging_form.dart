@@ -142,38 +142,44 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 10),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _showDateTimePicker(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(10),
-                      backgroundColor: Colors.blueGrey,
-                      foregroundColor: const Color.fromARGB(255, 245, 228, 178),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.access_time),
-                        SizedBox(width: 12),
-                        Text(
-                          'Select Takeoff Time',
-                          style: TextStyle(fontSize: 15),
+                Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          _showDateTimePicker(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.all(10),
+                          backgroundColor: Colors.blueGrey,
+                          foregroundColor:
+                              const Color.fromARGB(255, 245, 228, 178),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
-                      ],
-                    ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.access_time),
+                            SizedBox(width: 12),
+                            Text(
+                              'Select Takeoff Time',
+                              style: TextStyle(fontSize: 15),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Takeoff Time: ${_formatDateTime(_selectedTakeoffTime)}',
+                        style: const TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                ),
-                Center(
-                  child: Text(
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold),
-                      'Takeoff Time: ${_formatDateTime(_selectedTakeoffTime)}'),
                 ),
                 const Divider(
                   color: Colors.blueGrey,
