@@ -57,8 +57,7 @@ class _PlanesScreenState extends State<PlanesScreen>
                       indicatorSize: TabBarIndicatorSize.label,
                       indicatorWeight: 5,
                       indicator: BoxDecoration(
-                        color: const Color.fromARGB(255, 219, 219,
-                            219), // Set color for the pill indicator
+                        color: const Color.fromARGB(255, 219, 219, 219),
                         borderRadius: BorderRadius.circular(5),
                       ),
                       controller: _tabController,
