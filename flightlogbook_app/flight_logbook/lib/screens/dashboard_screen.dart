@@ -23,6 +23,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _lastDestination = 'N/A';
     _lastTakeoffTime = 'N/A';
     _populateData();
+    _checkExpiryWarnings();
   }
 
   Future<void> _populateData() async {
@@ -60,6 +61,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() {
       _lastDestination = lastDestination;
     });
+  }
+
+  Future<void> _checkExpiryWarnings() async {
+    DateTime currentDate = DateTime.now();
+
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('your_collection_name')
+          .where('expiryDate', isGreaterThan: Timestamp.fromDate(currentDate))
+          .get();
+
+      querySnapshot.docs.forEach((doc) {
+        Timestamp expiryTimestamp = doc['expiryDate'] as Timestamp;
+        DateTime expiryDate = expiryTimestamp.toDate();
+
+        int daysUntilExpiry = expiryDate.difference(currentDate).inDays;
+        if (daysUntilExpiry <= 30) {
+
+          String fileName = doc['fileName'] as String;
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Expiry Warning'),
+                content: Text(
+                    'The document "$fileName" will expire in $daysUntilExpiry days.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      });
+    } catch (error) {
+      print('Error checking expiry warnings: $error');
+    }
   }
 
   @override
