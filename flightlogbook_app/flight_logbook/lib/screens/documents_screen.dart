@@ -178,17 +178,15 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 2),
-            const Padding(
-              padding: EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  'Please select a file',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Color.fromARGB(255, 49, 67, 76),
-                    fontWeight: FontWeight.bold,
-                  ),
+            const SizedBox.shrink(),
+            const SizedBox(height: 10),
+            const Center(
+              child: Text(
+                'Please select an expiry date',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Color.fromARGB(255, 49, 67, 76),
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -196,12 +194,33 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               onTap: _selectFile,
               description: 'Select File',
             ),
-            const SizedBox(height: 10),
+            _selectedFile != null
+                ? const Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.check,
+                          color: Colors.green,
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          'File selected',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Color.fromARGB(255, 49, 67, 76),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : const SizedBox(height: 10),
             const Center(
               child: Text(
                 'Please select a expiry date',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   color: Color.fromARGB(255, 49, 67, 76),
                   fontWeight: FontWeight.bold,
                 ),
@@ -217,22 +236,24 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                 child: Text(
                   'Expiry Date: ${_expiryDate.day}/${_expiryDate.month}/${_expiryDate.year}',
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     color: Color.fromARGB(255, 49, 67, 76),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
+            const SizedBox(height: 10),
             MyButton(
               onTap: _uploadDocument,
               description: 'Upload Document',
             ),
+            const SizedBox(height: 10),
             const Divider(
               color: Colors.blueGrey,
               thickness: 2,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
             const Text(
               'User Documents:',
               style: TextStyle(
@@ -242,7 +263,8 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               ),
             ),
             _isloading
-                ? const SpinKitHourGlass(color: Color.fromARGB(255, 255, 196, 85))
+                ? const SpinKitHourGlass(
+                    color: Color.fromARGB(255, 255, 196, 85))
                 : const SizedBox(height: 10),
             ListView.builder(
               shrinkWrap: true,

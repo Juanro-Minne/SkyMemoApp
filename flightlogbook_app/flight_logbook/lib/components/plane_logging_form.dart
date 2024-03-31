@@ -51,7 +51,7 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 10.0),
+                const SizedBox(height: 20.0),
                 CustomTextField(
                   controller: _engineTypeController,
                   labelText: 'Engine Type',
@@ -63,7 +63,7 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 20.0),
                 CustomTextField(
                   controller: _totalHoursController,
                   labelText: 'Total Hours',
