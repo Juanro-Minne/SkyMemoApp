@@ -53,7 +53,8 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
                   future: widget.fetchPlaneRegistrations(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const LinearProgressIndicator();
+                      return const LinearProgressIndicator(
+                          color: Color.fromARGB(255, 255, 196, 85));
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else {
