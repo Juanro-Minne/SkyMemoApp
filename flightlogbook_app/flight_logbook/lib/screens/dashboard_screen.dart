@@ -16,6 +16,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _lastFlightTime = 0;
   late String _lastTakeoffTime;
   late String? _lastDestination;
+  List<Widget> expiryWarningCards = [];
 
   @override
   void initState() {
@@ -24,6 +25,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _lastTakeoffTime = 'N/A';
     _populateData();
     _checkExpiryWarnings();
+    _buildExpiryWarningCards();
   }
 
   Future<void> _populateData() async {
@@ -33,6 +35,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _populateLastTakeoffTime(),
       _populateLastDestination(),
     ]);
+    List<Widget> warnings = await _checkExpiryWarnings();
+    setState(() {
+      expiryWarningCards = warnings;
+    });
   }
 
   Future<void> _populateLastFlightTime() async {
@@ -63,7 +69,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  Future<void> _checkExpiryWarnings() async {
+  Future<List<Widget>> _checkExpiryWarnings() async {
+    List<Widget> expiryWarningCards = [];
     DateTime currentDate = DateTime.now();
 
     try {
@@ -78,31 +85,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
         int daysUntilExpiry = expiryDate.difference(currentDate).inDays;
         if (daysUntilExpiry <= 30) {
-
           String fileName = doc['fileName'] as String;
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('Expiry Warning'),
-                content: Text(
-                    'The document "$fileName" will expire in $daysUntilExpiry days.'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text('OK'),
-                  ),
-                ],
-              );
-            },
+
+          Widget expiryCard = Card(
+            child: ListTile(
+              title: Text('Document: $fileName'),
+              subtitle: Text('Expires in $daysUntilExpiry days'),
+            ),
           );
+          expiryWarningCards.add(expiryCard);
         }
       });
     } catch (error) {
       print('Error checking expiry warnings: $error');
     }
+    print('warnings found');
+
+    return expiryWarningCards;
+  }
+
+  List<Widget> _buildExpiryWarningCards() {
+    List<Widget> warningCards = [];
+
+    for (var warning in expiryWarningCards) {
+      warningCards.add(
+        const Card(
+          child: ListTile(
+            title: Text('Document expiring soon'),
+            subtitle: Text('Remember to renew'),
+            trailing: IconButton(
+              icon: Icon(Icons.info),
+              onPressed: null,
+            ),
+          ),
+        ),
+      );
+    }
+    return warningCards;
   }
 
   @override
@@ -130,7 +149,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   borderRadius: BorderRadius.circular(20),
                   child: const Center(
                     child: Text(
-                      "Wellcome Back !",
+                      "Welcome Back !",
                       style: TextStyle(
                           fontSize: 35,
                           fontWeight: FontWeight.bold,
@@ -201,6 +220,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const Divider(
                 color: Colors.blueGrey,
                 thickness: 2,
+              ),
+              Flexible(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: expiryWarningCards.isNotEmpty
+                      ? expiryWarningCards
+                      : [
+                          ListTile(
+                            title: Text('No expiry warnings'),
+                          ),
+                        ],
+                ),
               ),
             ],
           ),
