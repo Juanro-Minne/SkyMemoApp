@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: Colors.greenAccent,
-          duration: Duration (seconds: 2),
+          duration: Duration(seconds: 2),
           content: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -61,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
                 'Signing In....!',
                 style: TextStyle(color: Colors.black),
               ),
-               SpinKitHourGlass(color: Color.fromARGB(255, 255, 196, 85))
+              SpinKitHourGlass(color: Color.fromARGB(255, 255, 196, 85))
             ],
           ),
         ),
@@ -192,7 +192,15 @@ class _LoginPageState extends State<LoginPage> {
                   onTap: signUserIn,
                   description: 'Sign In',
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 15),
+                MyButton(
+                  onTap: () {
+                    passwordController.clear();
+                    emailController.clear();
+                  },
+                  description: 'Clear',
+                ),
+                const SizedBox(height: 30),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Row(
