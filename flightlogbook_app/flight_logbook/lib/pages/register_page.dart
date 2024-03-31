@@ -111,30 +111,19 @@ class _RegisterPageState extends State<RegisterPage> {
                   hintText: 'confirm Password',
                   obscureText: true,
                 ),
-
-                const SizedBox(height: 10),
-
-                // forgot password?
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Forgot Password?',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ],
-                  ),
-                ),
-
                 const SizedBox(height: 25),
-
                 MyButton(
                   onTap: signUp,
-                  description: "register",
+                  description: "Register",
                 ),
-
+                const SizedBox(height: 25),
+                MyButton(
+                  onTap: () {
+                    emailController.clear();
+                    passwordController.clear();
+                  },
+                  description: "Clear",
+                ),
                 const SizedBox(height: 50),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
