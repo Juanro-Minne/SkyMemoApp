@@ -133,8 +133,13 @@ class _PlanesScreenState extends State<PlanesScreen>
         builder: (context) => const AlertDialog(
           content: Row(
             children: [
-              SpinKitHourGlass(color: Color.fromARGB(255, 255, 196, 85)),
-              SizedBox(width: 20),
+              SizedBox(
+                width: 30,
+                height: 30,
+                child:
+                    SpinKitHourGlass(color: Color.fromARGB(255, 255, 196, 85)),
+              ),
+              SizedBox(width: 10),
               Text("Adding plane..."),
             ],
           ),
@@ -189,7 +194,11 @@ class _PlanesScreenState extends State<PlanesScreen>
 
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Plane added successfully')),
+        const SnackBar(
+          content: Text('Plane added successfully'),
+          backgroundColor: Color.fromARGB(255, 105, 123, 240),
+          duration: Duration(seconds: 1),
+        ),
       );
     } catch (e) {
       Navigator.of(context).pop();
