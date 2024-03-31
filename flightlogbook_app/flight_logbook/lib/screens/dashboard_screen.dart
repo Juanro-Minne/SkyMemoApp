@@ -1,8 +1,11 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flight_logbook/components/data_tile.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -16,6 +19,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _lastFlightTime = 0;
   late String _lastTakeoffTime;
   late String? _lastDestination;
+  List<Widget> expiryWarningCards = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -23,6 +28,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _lastDestination = 'N/A';
     _lastTakeoffTime = 'N/A';
     _populateData();
+    _checkExpiryWarnings();
   }
 
   Future<void> _populateData() async {
@@ -32,6 +38,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _populateLastTakeoffTime(),
       _populateLastDestination(),
     ]);
+    List<Widget> warnings = await _checkExpiryWarnings();
+    setState(() {
+      expiryWarningCards = warnings;
+      _isLoading = false;
+    });
   }
 
   Future<void> _populateLastFlightTime() async {
@@ -62,6 +73,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
+  Future<List<Widget>> _checkExpiryWarnings() async {
+    List<Widget> expiryWarningCards = [];
+    DateTime currentDate = DateTime.now();
+
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('documents')
+          .where('expiryDate', isGreaterThan: Timestamp.fromDate(currentDate))
+          .get();
+
+      querySnapshot.docs.forEach((doc) {
+        Timestamp expiryTimestamp = doc['expiryDate'] as Timestamp;
+        DateTime expiryDate = expiryTimestamp.toDate();
+
+        int daysUntilExpiry = expiryDate.difference(currentDate).inDays;
+        if (daysUntilExpiry <= 30) {
+          String fileName = doc['fileName'] as String;
+
+          Widget expiryCard = Card(
+            child: ListTile(
+              title: Text('Document: $fileName'),
+              subtitle: Text('Expires in $daysUntilExpiry days'),
+            ),
+          );
+          expiryWarningCards.add(expiryCard);
+        }
+      });
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error chacking expiry warnings'),
+          backgroundColor: Color.fromARGB(255, 231, 85, 85),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
+    return expiryWarningCards;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,7 +137,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   borderRadius: BorderRadius.circular(20),
                   child: const Center(
                     child: Text(
-                      "Wellcome Back !",
+                      "Welcome Back !",
                       style: TextStyle(
                           fontSize: 35,
                           fontWeight: FontWeight.bold,
@@ -159,6 +209,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 color: Colors.blueGrey,
                 thickness: 2,
               ),
+              _isLoading
+                  ? const SpinKitHourGlass(color: Color.fromARGB(255, 255, 196, 85))
+                  : SizedBox(
+                      height: 200,
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: expiryWarningCards.isNotEmpty
+                            ? expiryWarningCards
+                            : [
+                                const ListTile(
+                                  title: Text('No expiry warnings'),
+                                ),
+                              ],
+                      ),
+                    ),
             ],
           ),
         ],

@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_logbook/components/plane_logging_form.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../components/tab.dart';
 
 class PlanesScreen extends StatefulWidget {
@@ -132,7 +133,7 @@ class _PlanesScreenState extends State<PlanesScreen>
         builder: (context) => const AlertDialog(
           content: Row(
             children: [
-              CircularProgressIndicator(),
+              SpinKitHourGlass(color: Color.fromARGB(255, 255, 196, 85)),
               SizedBox(width: 20),
               Text("Adding plane..."),
             ],

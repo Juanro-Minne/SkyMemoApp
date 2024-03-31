@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously, deprecated_member_use
 
 import 'dart:io';
 import 'dart:typed_data';
@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../components/custom_button.dart';
 
@@ -22,6 +23,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<int> _selectedFileBytes = [];
   List<String> _documentNames = [];
+  bool _isloading = true;
 
   late DateTime _expiryDate = DateTime.now();
   PlatformFile? _selectedFile;
@@ -93,7 +95,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             const SnackBar(
               content: Text('Document uploaded successfully'),
               backgroundColor: Color.fromARGB(255, 105, 123, 240),
-              duration: Duration(seconds: 3),
+              duration: Duration(seconds: 2),
             ),
           );
           setState(() {
@@ -138,6 +140,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
           _documentNames = userDocsSnapshot.docs
               .map<String>((doc) => doc['fileName'] as String)
               .toList();
+          _isloading = false;
         });
       }
     } catch (e) {
@@ -175,17 +178,15 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 2),
-            const Padding(
-              padding: EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  'Please select a file',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Color.fromARGB(255, 49, 67, 76),
-                    fontWeight: FontWeight.bold,
-                  ),
+            const SizedBox.shrink(),
+            const SizedBox(height: 10),
+            const Center(
+              child: Text(
+                'Please select an expiry date',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Color.fromARGB(255, 49, 67, 76),
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -193,12 +194,33 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               onTap: _selectFile,
               description: 'Select File',
             ),
-            const SizedBox(height: 10),
+            _selectedFile != null
+                ? const Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.check,
+                          color: Colors.green,
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          'File selected',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Color.fromARGB(255, 49, 67, 76),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : const SizedBox(height: 10),
             const Center(
               child: Text(
                 'Please select a expiry date',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   color: Color.fromARGB(255, 49, 67, 76),
                   fontWeight: FontWeight.bold,
                 ),
@@ -214,22 +236,24 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                 child: Text(
                   'Expiry Date: ${_expiryDate.day}/${_expiryDate.month}/${_expiryDate.year}',
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     color: Color.fromARGB(255, 49, 67, 76),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
+            const SizedBox(height: 10),
             MyButton(
               onTap: _uploadDocument,
               description: 'Upload Document',
             ),
+            const SizedBox(height: 10),
             const Divider(
               color: Colors.blueGrey,
               thickness: 2,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
             const Text(
               'User Documents:',
               style: TextStyle(
@@ -238,7 +262,10 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 10),
+            _isloading
+                ? const SpinKitHourGlass(
+                    color: Color.fromARGB(255, 255, 196, 85))
+                : const SizedBox(height: 10),
             ListView.builder(
               shrinkWrap: true,
               itemCount: _documentNames.length,

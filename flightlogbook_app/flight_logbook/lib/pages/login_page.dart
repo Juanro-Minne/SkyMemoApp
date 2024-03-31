@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flight_logbook/components/custom_button.dart';
 import 'package:flight_logbook/components/textfield.dart';
 import 'package:flight_logbook/components/tile.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 import 'package:flight_logbook/screens/dashboard_screen.dart';
@@ -60,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
                 'Signing In....!',
                 style: TextStyle(color: Colors.black),
               ),
-              CircularProgressIndicator(),
+               SpinKitHourGlass(color: Color.fromARGB(255, 255, 196, 85))
             ],
           ),
         ),
