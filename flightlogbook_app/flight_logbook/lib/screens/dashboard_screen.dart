@@ -83,7 +83,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           .where('expiryDate', isGreaterThan: Timestamp.fromDate(currentDate))
           .get();
 
-      querySnapshot.docs.forEach((doc) {
+      for (var doc in querySnapshot.docs) {
         Timestamp expiryTimestamp = doc['expiryDate'] as Timestamp;
         DateTime expiryDate = expiryTimestamp.toDate();
 
@@ -99,7 +99,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           );
           expiryWarningCards.add(expiryCard);
         }
-      });
+      }
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -269,7 +269,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
         totalFlights = querySnapshot.size;
       } catch (error) {
-        print('Error getting total flights: $error');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error getting total flights'),
+            backgroundColor: Color.fromARGB(255, 231, 85, 85),
+            duration: Duration(seconds: 3),
+          ),
+        );
       }
     }
     return totalFlights;
