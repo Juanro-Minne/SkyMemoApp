@@ -1,8 +1,11 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flight_logbook/components/data_tile.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -17,6 +20,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   late String _lastTakeoffTime;
   late String? _lastDestination;
   List<Widget> expiryWarningCards = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -25,7 +29,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _lastTakeoffTime = 'N/A';
     _populateData();
     _checkExpiryWarnings();
-    _buildExpiryWarningCards();
   }
 
   Future<void> _populateData() async {
@@ -38,6 +41,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     List<Widget> warnings = await _checkExpiryWarnings();
     setState(() {
       expiryWarningCards = warnings;
+      _isLoading = false;
     });
   }
 
@@ -75,7 +79,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('your_collection_name')
+          .collection('documents')
           .where('expiryDate', isGreaterThan: Timestamp.fromDate(currentDate))
           .get();
 
@@ -97,31 +101,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
         }
       });
     } catch (error) {
-      print('Error checking expiry warnings: $error');
-    }
-    print('warnings found');
-
-    return expiryWarningCards;
-  }
-
-  List<Widget> _buildExpiryWarningCards() {
-    List<Widget> warningCards = [];
-
-    for (var warning in expiryWarningCards) {
-      warningCards.add(
-        const Card(
-          child: ListTile(
-            title: Text('Document expiring soon'),
-            subtitle: Text('Remember to renew'),
-            trailing: IconButton(
-              icon: Icon(Icons.info),
-              onPressed: null,
-            ),
-          ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error chacking expiry warnings'),
+          backgroundColor: Color.fromARGB(255, 231, 85, 85),
+          duration: Duration(seconds: 3),
         ),
       );
     }
-    return warningCards;
+    return expiryWarningCards;
   }
 
   @override
@@ -221,18 +209,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 color: Colors.blueGrey,
                 thickness: 2,
               ),
-              Flexible(
-                child: ListView(
-                  shrinkWrap: true,
-                  children: expiryWarningCards.isNotEmpty
-                      ? expiryWarningCards
-                      : [
-                          ListTile(
-                            title: Text('No expiry warnings'),
-                          ),
-                        ],
-                ),
-              ),
+              _isLoading
+                  ? const SpinKitHourGlass(color: Color.fromARGB(255, 255, 196, 85))
+                  : SizedBox(
+                      height: 200,
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: expiryWarningCards.isNotEmpty
+                            ? expiryWarningCards
+                            : [
+                                const ListTile(
+                                  title: Text('No expiry warnings'),
+                                ),
+                              ],
+                      ),
+                    ),
             ],
           ),
         ],

@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../components/custom_button.dart';
 
@@ -22,6 +23,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<int> _selectedFileBytes = [];
   List<String> _documentNames = [];
+  bool _isloading = true;
 
   late DateTime _expiryDate = DateTime.now();
   PlatformFile? _selectedFile;
@@ -138,6 +140,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
           _documentNames = userDocsSnapshot.docs
               .map<String>((doc) => doc['fileName'] as String)
               .toList();
+          _isloading = false;
         });
       }
     } catch (e) {
@@ -238,7 +241,9 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 10),
+            _isloading
+                ? const SpinKitHourGlass(color: Color.fromARGB(255, 255, 196, 85))
+                : const SizedBox(height: 10),
             ListView.builder(
               shrinkWrap: true,
               itemCount: _documentNames.length,
