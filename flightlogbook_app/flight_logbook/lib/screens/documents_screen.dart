@@ -152,9 +152,12 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
 
   Future<void> _downloadFile(String fileName) async {
     try {
-      String downloadUrl = '';
-      if (await canLaunch(downloadUrl)) {
-        await launch(downloadUrl);
+      final storageRef = FirebaseStorage.instance.ref('documents/$fileName');
+      final String downloadUrl = await storageRef.getDownloadURL();
+      final Uri url = Uri.parse(downloadUrl);
+
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -166,6 +169,39 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error downloading file: $e')),
+      );
+    }
+  }
+
+  Future<void> _deleteFile(String fileName) async {
+    try {
+      final reference = FirebaseStorage.instance.ref('documents/$fileName');
+      await reference.delete();
+
+      await _firestore
+          .collection('documents')
+          .where('fileName', isEqualTo: fileName)
+          .get()
+          .then((querySnapshot) {
+        querySnapshot.docs.forEach((doc) async {
+          await doc.reference.delete();
+        });
+      });
+      setState(() {
+        _documentNames.remove(fileName);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Document deleted successfully'),
+          backgroundColor: Color.fromARGB(255, 105, 123, 240),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error deleting document: $e'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -279,9 +315,21 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                   child: ListTile(
                     title: Text(_documentNames[index]),
                     leading: IconButton(
-                      icon: const Icon(Icons.file_download),
+                      icon: const Icon(
+                        Icons.file_download,
+                        color: Colors.brown,
+                      ),
                       onPressed: () {
                         _downloadFile(_documentNames[index]);
+                      },
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                      ),
+                      onPressed: () {
+                        _deleteFile(_documentNames[index]);
                       },
                     ),
                   ),

@@ -210,7 +210,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 thickness: 2,
               ),
               _isLoading
-                  ? const SpinKitHourGlass(color: Color.fromARGB(255, 255, 196, 85))
+                  ? const SpinKitHourGlass(
+                      color: Color.fromARGB(255, 255, 196, 85))
                   : SizedBox(
                       height: 200,
                       child: ListView(
