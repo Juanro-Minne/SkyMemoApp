@@ -72,6 +72,9 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   }
 
   Future<void> _uploadDocument() async {
+    setState(() {
+      _isloading = true;
+    });
     try {
       if (_selectedFileBytes.isNotEmpty) {
         final fileName = _selectedFile!.name;
@@ -94,7 +97,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             const SnackBar(
               content: Text('Document uploaded successfully'),
               backgroundColor: Color.fromARGB(255, 105, 123, 240),
-              duration: Duration(seconds: 2),
+              duration: Duration(milliseconds: 1500),
             ),
           );
           setState(() {
@@ -124,6 +127,10 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error uploading document: $e')),
       );
+    } finally {
+      setState(() {
+        _isloading = false;
+      });
     }
   }
 
@@ -160,6 +167,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
+            duration: Duration(seconds: 1),
             content: Text('Could not launch download URL'),
             backgroundColor: Colors.red,
           ),
@@ -191,6 +199,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
+          duration: Duration(seconds: 1),
           content: Text('Document deleted successfully'),
           backgroundColor: Color.fromARGB(255, 105, 123, 240),
         ),

@@ -88,22 +88,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
         DateTime expiryDate = expiryTimestamp.toDate();
 
         int daysUntilExpiry = expiryDate.difference(currentDate).inDays;
-        if (daysUntilExpiry <= 30) {
+        if (daysUntilExpiry <= 30 && daysUntilExpiry > 0) {
           String fileName = doc['fileName'] as String;
 
           Widget expiryCard = Card(
+            color: const Color.fromARGB(255, 230, 215, 194),
             child: ListTile(
               title: Text('Document: $fileName'),
               subtitle: Text('Expires in $daysUntilExpiry days'),
             ),
           );
+
           expiryWarningCards.add(expiryCard);
+        } else if (daysUntilExpiry <= 0) {
+          String fileName = doc['fileName'] as String;
+          Widget expiredCard = Card(
+            color: Colors.red,
+            child: ListTile(
+              title: Text('Document: $fileName'),
+              subtitle: const Text('This document has expired'),
+            ),
+          );
+          expiryWarningCards.add(expiredCard);
         }
       }
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Error chacking expiry warnings'),
+          content: Text('Error checking expiry warnings'),
           backgroundColor: Color.fromARGB(255, 231, 85, 85),
           duration: Duration(seconds: 3),
         ),
@@ -273,7 +285,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SnackBar(
             content: Text('Error getting total flights'),
             backgroundColor: Color.fromARGB(255, 231, 85, 85),
-            duration: Duration(seconds: 3),
+            duration: Duration(milliseconds: 1500),
           ),
         );
       }
