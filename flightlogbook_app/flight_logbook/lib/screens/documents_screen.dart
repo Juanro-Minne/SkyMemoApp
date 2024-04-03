@@ -7,8 +7,12 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../components/custom_button.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 
 class DocumentsScreen extends StatefulWidget {
   const DocumentsScreen({Key? key}) : super(key: key);
@@ -157,29 +161,39 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   }
 
   Future<void> _downloadFile(String fileName) async {
-    try {
+  try {
+    final status = await Permission.storage.request();
+    if (status.isGranted) {
       final storageRef = FirebaseStorage.instance.ref('documents/$fileName');
       final String downloadUrl = await storageRef.getDownloadURL();
-      final Uri url = Uri.parse(downloadUrl);
+      final response = await http.get(Uri.parse(downloadUrl));
 
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url);
+      if (response.statusCode == 200) {
+        final directory = (await getExternalStorageDirectory())?.path ?? ""; 
+        final filePath = '$directory/$fileName';
+        final file = File(filePath);
+
+        await file.writeAsBytes(response.bodyBytes);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('File downloaded to $filePath')),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            duration: Duration(seconds: 1),
-            content: Text('Could not launch download URL'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Failed to download file')),
         );
       }
-    } catch (e) {
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error downloading file: $e')),
+        SnackBar(content: Text('Storage permission denied')),
       );
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error downloading file: $e')),
+    );
   }
-
+}
   Future<void> _deleteFile(String fileName) async {
     try {
       final reference = FirebaseStorage.instance.ref('documents/$fileName');
