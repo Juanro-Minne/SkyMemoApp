@@ -75,16 +75,17 @@ class _FlightLoggingFormState extends State<FlightLoggingForm> {
                           );
                         }).toList(),
                         decoration: InputDecoration(
-                          enabledBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.blueGrey),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey.shade400),
-                          ),
-                          fillColor: Colors.grey.shade200,
-                          filled: true,
-                          labelText: 'Plane Registration',
-                        ),
+                            enabledBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.blueGrey),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.grey.shade400),
+                            ),
+                            fillColor: Colors.grey.shade200,
+                            filled: true,
+                            labelText: 'Plane Registration',
+                            hintStyle: TextStyle(color: Colors.grey[500])),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please select plane registration';
