@@ -7,7 +7,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../components/custom_button.dart';
 import 'package:path_provider/path_provider.dart';
@@ -162,30 +161,22 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
 
   Future<void> _downloadFile(String fileName) async {
   try {
-    final status = await Permission.storage.request();
-    if (status.isGranted) {
-      final storageRef = FirebaseStorage.instance.ref('documents/$fileName');
-      final String downloadUrl = await storageRef.getDownloadURL();
-      final response = await http.get(Uri.parse(downloadUrl));
+    final storageRef = FirebaseStorage.instance.ref('documents/$fileName');
+    final String downloadUrl = await storageRef.getDownloadURL();
+    final Uri url = Uri.parse(downloadUrl);
 
-      if (response.statusCode == 200) {
-        final directory = (await getExternalStorageDirectory())?.path ?? ""; 
-        final filePath = '$directory/$fileName';
-        final file = File(filePath);
+    if (await canLaunchUrl(url)) {
+      final directory = await getDownloadsDirectory();
+      final filePath = '${directory!.path}/$fileName';
 
-        await file.writeAsBytes(response.bodyBytes);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('File downloaded to $filePath')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to download file')),
-        );
-      }
+      await launchUrl(url, downloadedFile: File(filePath));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Storage permission denied')),
+        const SnackBar(
+          duration: Duration(seconds: 1),
+          content: Text('Could not launch download URL'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   } catch (e) {
@@ -193,6 +184,10 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
       SnackBar(content: Text('Error downloading file: $e')),
     );
   }
+}
+
+Future<void> launchUrl(Uri uri, {File? downloadedFile}) async {
+  await launch(uri.toString());
 }
   Future<void> _deleteFile(String fileName) async {
     try {
