@@ -189,7 +189,8 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
 Future<void> launchUrl(Uri uri, {File? downloadedFile}) async {
   await launch(uri.toString());
 }
-  Future<void> _deleteFile(String fileName) async {
+
+Future<void> _deleteFile(String fileName) async {
     try {
       final reference = FirebaseStorage.instance.ref('documents/$fileName');
       await reference.delete();
