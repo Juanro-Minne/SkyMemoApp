@@ -21,7 +21,7 @@ class _MyAppBarState extends State<MyAppBar> {
     return AppBar(
       backgroundColor: const Color.fromARGB(255, 76, 118, 84),
       foregroundColor: const Color.fromARGB(255, 212, 198, 106),
-      elevation: 0,
+      elevation: 5,
       title: Row(
         children: [
           Text(
