@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flight_logbook/components/flight_logging_form.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import '../components/tab.dart';
 
@@ -293,6 +294,25 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
     required DateTime takeoffTime,
   }) async {
     try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const AlertDialog(
+          content: Row(
+            children: [
+              SizedBox(
+                width: 30,
+                height: 30,
+                child:
+                    SpinKitHourGlass(color: Color.fromARGB(255, 255, 196, 85)),
+              ),
+              SizedBox(width: 10),
+              Text("Logging flight..."),
+            ],
+          ),
+        ),
+      );
+
       User? user = _auth.currentUser;
       if (user != null) {
         String userId = user.email ?? '';
@@ -342,6 +362,8 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
           content: Text('Failed to log flight: $e'),
         ),
       );
+    } finally {
+      Navigator.of(context).pop(); // Dismiss the loading dialog
     }
   }
 }
