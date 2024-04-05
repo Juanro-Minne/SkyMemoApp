@@ -27,7 +27,7 @@ class _MyAppBarState extends State<MyAppBar> {
           Text(
             widget.title.toUpperCase(),
             style: const TextStyle(
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               letterSpacing: 2,
             ),
@@ -36,7 +36,7 @@ class _MyAppBarState extends State<MyAppBar> {
       ),
       actions: [
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(6.0),
           child: UserProfileIcon(),
         ),
       ],
@@ -87,7 +87,7 @@ class UserProfileIcon extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Icon(user != null
             ? Icons.person
-            : Icons.person_outline), // Fix the null check
+            : Icons.person_outline), 
       ),
     );
   }

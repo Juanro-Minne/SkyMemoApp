@@ -49,18 +49,18 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(title: _getTitle(_selectedIndex)),
-      body: Stack(
-        children: [
-          _getBodyWidget(_selectedIndex),
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            alignment: Alignment.bottomCenter,
-            child: BottomNavBar(
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: _getBodyWidget(_selectedIndex),
+            ),
+            BottomNavBar(
               currentIndex: _selectedIndex,
               onTap: _onItemTapped,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

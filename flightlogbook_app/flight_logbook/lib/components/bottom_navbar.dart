@@ -17,7 +17,8 @@ class BottomNavBar extends StatefulWidget {
   _BottomNavBarState createState() => _BottomNavBarState();
 }
 
-class _BottomNavBarState extends State<BottomNavBar> with WidgetsBindingObserver {
+class _BottomNavBarState extends State<BottomNavBar>
+    with WidgetsBindingObserver {
   bool _isKeyboardVisible = false;
 
   @override
@@ -48,7 +49,7 @@ class _BottomNavBarState extends State<BottomNavBar> with WidgetsBindingObserver
       child: Container(
         color: const Color.fromARGB(255, 76, 118, 84),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 11),
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 11),
           child: GNav(
             color: const Color.fromARGB(255, 212, 198, 106),
             backgroundColor: const Color.fromARGB(255, 76, 118, 84),
