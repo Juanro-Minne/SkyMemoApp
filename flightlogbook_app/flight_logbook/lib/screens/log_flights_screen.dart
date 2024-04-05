@@ -312,6 +312,7 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
           ),
         ),
       );
+       setState(() {});
 
       User? user = _auth.currentUser;
       if (user != null) {
@@ -363,7 +364,7 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
         ),
       );
     } finally {
-      Navigator.of(context).pop(); // Dismiss the loading dialog
+      Navigator.of(context).pop(); 
     }
   }
 }

@@ -186,12 +186,12 @@ class _PlanesScreenState extends State<PlanesScreen>
           if (imageURL != null) 'imageUrl': imageURL,
         });
       }
-
-      _registrationController.clear();
-      _engineTypeController.clear();
-      _totalHoursController.clear();
-      _imageUrlController.clear();
-
+      setState(() {
+        _registrationController.clear();
+        _engineTypeController.clear();
+        _totalHoursController.clear();
+        _imageUrlController.clear();
+      });
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
