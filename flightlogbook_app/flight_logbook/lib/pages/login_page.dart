@@ -29,9 +29,9 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  StreamSubscription<User?>? _authStateChangesSubscription;
-
   final GoogleSignIn googleSignIn = GoogleSignIn();
+
+  StreamSubscription<User?>? _authStateChangesSubscription;
 
   @override
   void initState() {
@@ -101,20 +101,16 @@ class _LoginPageState extends State<LoginPage> {
           idToken: googleSignInAuthentication.idToken,
         );
         await FirebaseAuth.instance.signInWithCredential(credential);
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const DashboardScreen()));
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const DashboardScreen()),
+        );
+      } else {
+        print('Google Sign-In failed');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.redAccent.withOpacity(0.7),
-          content: Text(
-            getErrorMessage(e),
-            style: const TextStyle(color: Colors.black),
-          ),
-          duration: const Duration(seconds: 3),
-        ),
-      );
+      print('Error signing in with Google: $e');
     }
   }
 
@@ -208,7 +204,7 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       SignInButton(
                         Buttons.google,
-                        onPressed: signInWithGoogle,
+                        onPressed: () => signInWithGoogle(),
                         text: 'Sign in with Google',
                       ),
                     ],
