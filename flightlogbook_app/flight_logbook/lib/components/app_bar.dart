@@ -22,24 +22,20 @@ class _MyAppBarState extends State<MyAppBar> {
       backgroundColor: const Color.fromARGB(255, 76, 118, 84),
       foregroundColor: const Color.fromARGB(255, 212, 198, 106),
       elevation: 5,
-      title: Row(
-        children: [
-          Text(
-            widget.title.toUpperCase(),
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: UserProfileIcon(),
+      title: Text(
+        widget.title.toUpperCase(),
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 2,
         ),
-      ],
+      ),
+       leading: IconButton(
+        icon: const Icon(Icons.menu), // Icon to open the drawer
+        onPressed: () {
+          Scaffold.of(context).openDrawer(); // Opens the drawer
+        },
+      ),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           bottom: Radius.circular(10),
@@ -49,7 +45,7 @@ class _MyAppBarState extends State<MyAppBar> {
   }
 }
 
-class UserProfileIcon extends StatelessWidget {
+class UserProfileDrawer extends StatelessWidget {
   void signUserOut() {
     FirebaseAuth.instance.signOut();
   }
@@ -58,37 +54,57 @@ class UserProfileIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
 
-    return PopupMenuButton<String>(
-      onSelected: (value) {
-        if (value == 'settings') {
-        } else if (value == 'logout') {
-          signUserOut();
-        }
-      },
-      itemBuilder: (BuildContext context) {
-        return [
-          const PopupMenuItem<String>(
-            value: 'settings',
-            child: ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          UserAccountsDrawerHeader(
+            accountName: Text(user != null ? user.displayName ?? 'No Name' : 'Guest'),
+            accountEmail: Text(user != null ? user.email ?? 'No Email' : 'Guest'),
+            currentAccountPicture: CircleAvatar(
+              child: Icon(user != null ? Icons.person : Icons.person_outline),
             ),
           ),
-          const PopupMenuItem<String>(
-            value: 'logout',
-            child: ListTile(
-              leading: Icon(Icons.exit_to_app),
-              title: Text('Logout'),
-            ),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('Settings'),
+            onTap: () {
+              // Optionally implement settings navigation or functionality
+              Navigator.pop(context);
+            },
           ),
-        ];
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Icon(user != null
-            ? Icons.person
-            : Icons.person_outline), 
+          ListTile(
+            leading: const Icon(Icons.exit_to_app),
+            title: const Text('Logout'),
+            onTap: () {
+              signUserOut();
+              Navigator.pop(context); // Optionally close drawer after action
+            },
+          ),
+        ],
       ),
     );
   }
+}
+
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: MyAppBar(title: 'Home'),
+      drawer: UserProfileDrawer(),
+      body: Container(),
+    );
+  }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: HomeScreen(),
+  ));
 }
