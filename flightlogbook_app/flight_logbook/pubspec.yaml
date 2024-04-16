@@ -21,7 +21,7 @@ dependencies:
   google_nav_bar: ^5.0.6
   google_sign_in: ^6.2.1
   google_sign_in_android: ^6.1.22
-  google_sign_in_web: ^0.12.4
+  google_sign_in_web: ^0.12.3
   sign_in_button: ^3.0.0
   firebase_storage: ^11.6.6
   intl: ^0.17.0
