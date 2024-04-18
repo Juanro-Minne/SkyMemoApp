@@ -196,7 +196,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            backgroundColor: const Color.fromARGB(255, 216, 216, 216),
             title: const Text('Captain ?'),
             content:
                 const Text('Are you sure you want to delete this document?'),
@@ -408,8 +407,8 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
           const SizedBox(height: 10),
           Image.asset(
             'lib/images/fighter-jet.gif',
-            width: 150,
-            height: 150,
+            width: 160,
+            height: 160,
           ),
         ],
       ),

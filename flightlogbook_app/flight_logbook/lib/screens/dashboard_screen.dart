@@ -257,8 +257,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const SizedBox(height: 10),
         Image.asset(
           'lib/images/fighter-jet.gif',
-          width: 150,
-          height: 150, 
+          width: 160,
+          height: 160, 
         ),
       ],
     ),
