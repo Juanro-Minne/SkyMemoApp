@@ -359,8 +359,29 @@ class _PlanesScreenState extends State<PlanesScreen>
   }
 
   Future<void> _deletePlane(String? planeId) async {
-    try {
-      if (planeId != null) {
+  try {
+    if (planeId != null) {
+      bool confirmDelete = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Confirm Delete'),
+            content: const Text('Are you sure you want to delete this plane?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Delete'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (confirmDelete == true) {
         await _firestore.collection('planes').doc(planeId).delete();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -370,13 +391,15 @@ class _PlanesScreenState extends State<PlanesScreen>
           ),
         );
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.redAccent.withOpacity(0.7),
-          content: Text('Failed to delete plane: $e'),
-        ),
-      );
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.redAccent.withOpacity(0.7),
+        content: Text('Failed to delete plane: $e'),
+      ),
+    );
   }
+}
+
 }

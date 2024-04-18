@@ -160,60 +160,84 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   }
 
   Future<void> _downloadFile(String fileName) async {
-  try {
-    final storageRef = FirebaseStorage.instance.ref('documents/$fileName');
-    final String downloadUrl = await storageRef.getDownloadURL();
-    final Uri url = Uri.parse(downloadUrl);
+    try {
+      final storageRef = FirebaseStorage.instance.ref('documents/$fileName');
+      final String downloadUrl = await storageRef.getDownloadURL();
+      final Uri url = Uri.parse(downloadUrl);
 
-    if (await canLaunchUrl(url)) {
-      final directory = await getDownloadsDirectory();
-      final filePath = '${directory!.path}/$fileName';
+      if (await canLaunchUrl(url)) {
+        final directory = await getDownloadsDirectory();
+        final filePath = '${directory!.path}/$fileName';
 
-      await launchUrl(url, downloadedFile: File(filePath));
-    } else {
+        await launchUrl(url, downloadedFile: File(filePath));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            duration: Duration(seconds: 1),
+            content: Text('Could not launch download URL'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          duration: Duration(seconds: 1),
-          content: Text('Could not launch download URL'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Error downloading file: $e')),
       );
     }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error downloading file: $e')),
-    );
   }
-}
 
-Future<void> launchUrl(Uri uri, {File? downloadedFile}) async {
-  await launch(uri.toString());
-}
+  Future<void> launchUrl(Uri uri, {File? downloadedFile}) async {
+    await launch(uri.toString());
+  }
 
-Future<void> _deleteFile(String fileName) async {
+  Future<void> _deleteFile(String fileName) async {
     try {
-      final reference = FirebaseStorage.instance.ref('documents/$fileName');
-      await reference.delete();
-
-      await _firestore
-          .collection('documents')
-          .where('fileName', isEqualTo: fileName)
-          .get()
-          .then((querySnapshot) {
-        querySnapshot.docs.forEach((doc) async {
-          await doc.reference.delete();
-        });
-      });
-      setState(() {
-        _documentNames.remove(fileName);
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          duration: Duration(seconds: 1),
-          content: Text('Document deleted successfully'),
-          backgroundColor: Color.fromARGB(255, 105, 123, 240),
-        ),
+      bool confirmDelete = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: const Color.fromARGB(255, 216, 216, 216),
+            title: const Text('Captain ?'),
+            content:
+                const Text('Are you sure you want to delete this document?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Delete'),
+              ),
+            ],
+          );
+        },
       );
+
+      if (confirmDelete == true) {
+        final reference = FirebaseStorage.instance.ref('documents/$fileName');
+        await reference.delete();
+
+        await _firestore
+            .collection('documents')
+            .where('fileName', isEqualTo: fileName)
+            .get()
+            .then((querySnapshot) {
+          querySnapshot.docs.forEach((doc) async {
+            await doc.reference.delete();
+          });
+        });
+        setState(() {
+          _documentNames.remove(fileName);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            duration: Duration(seconds: 1),
+            content: Text('Document deleted successfully'),
+            backgroundColor: Color.fromARGB(255, 105, 123, 240),
+          ),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -307,7 +331,7 @@ Future<void> _deleteFile(String fileName) async {
               color: Colors.blueGrey,
               thickness: 2,
             ),
-            const SizedBox(height: 5),
+            
             const Text(
               'User Documents:',
               style: TextStyle(
@@ -316,47 +340,78 @@ Future<void> _deleteFile(String fileName) async {
                 fontWeight: FontWeight.bold,
               ),
             ),
+             const Divider(
+              color: Colors.blueGrey,
+              thickness: 2,
+            ),
             _isloading
                 ? const SpinKitHourGlass(
                     color: Color.fromARGB(255, 255, 196, 85))
                 : const SizedBox(height: 10),
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: _documentNames.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  elevation: 4,
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+            _documentNames.isEmpty
+                ? _buildNoDocumentsWidget()
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _documentNames.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        elevation: 4,
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: ListTile(
+                          title: Text(_documentNames[index]),
+                          leading: IconButton(
+                            icon: const Icon(
+                              Icons.file_download,
+                              color: Colors.brown,
+                            ),
+                            onPressed: () {
+                              _downloadFile(_documentNames[index]);
+                            },
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Colors.red,
+                            ),
+                            onPressed: () {
+                              _deleteFile(_documentNames[index]);
+                            },
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  child: ListTile(
-                    title: Text(_documentNames[index]),
-                    leading: IconButton(
-                      icon: const Icon(
-                        Icons.file_download,
-                        color: Colors.brown,
-                      ),
-                      onPressed: () {
-                        _downloadFile(_documentNames[index]);
-                      },
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(
-                        Icons.delete,
-                        color: Colors.red,
-                      ),
-                      onPressed: () {
-                        _deleteFile(_documentNames[index]);
-                      },
-                    ),
-                  ),
-                );
-              },
-            ),
             const SizedBox(height: 20),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildNoDocumentsWidget() {
+    return SizedBox(
+      height: 250,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            'Please upload a document',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+              color: Color.fromARGB(255, 52, 67, 75),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Image.asset(
+            'lib/images/fighter-jet.gif',
+            width: 150,
+            height: 150,
+          ),
+        ],
       ),
     );
   }

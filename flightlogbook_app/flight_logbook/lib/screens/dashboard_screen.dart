@@ -103,7 +103,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         } else if (daysUntilExpiry <= 0) {
           String fileName = doc['fileName'] as String;
           Widget expiredCard = Card(
-            color: Colors.red,
+            color: const Color.fromARGB(255, 255, 131, 122),
             child: ListTile(
               title: Text('Document: $fileName'),
               subtitle: const Text('This document has expired'),
@@ -163,12 +163,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   DataTile(
-                    title: "Last Flight Time",
+                    title: "Last Flight Time:",
                     value: _lastFlightTime.toString(),
                     backgroundColor: const Color.fromARGB(255, 201, 192, 192),
                   ),
                   DataTile(
-                    title: "Total Flights",
+                    title: "Total Flights:",
                     value: _totalFlights.toString(),
                     backgroundColor: const Color.fromARGB(255, 201, 192, 192),
                   ),
@@ -179,12 +179,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   DataTile(
-                    title: "Last Destination",
+                    title: "Last Destination:",
                     value: _lastDestination != null ? _lastDestination! : 'N/A',
                     backgroundColor: const Color.fromARGB(255, 201, 192, 192),
                   ),
                   DataTile(
-                    title: "Last Takeoff",
+                    title: "Last Takeoff time:",
                     value: _lastTakeoffTime.toString(),
                     backgroundColor: const Color.fromARGB(255, 201, 192, 192),
                   ),
@@ -223,26 +223,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               _isLoading
                   ? const SpinKitHourGlass(
-                      color: Color.fromARGB(255, 255, 196, 85))
-                  : SizedBox(
-                      height: 200,
-                      child: ListView(
-                        shrinkWrap: true,
-                        children: expiryWarningCards.isNotEmpty
-                            ? expiryWarningCards
-                            : [
-                                const ListTile(
-                                  title: Text('No expiry warnings'),
-                                ),
-                              ],
-                      ),
-                    ),
+                    color: Color.fromARGB(255, 255, 196, 85))
+                : expiryWarningCards.isNotEmpty
+                    ? SizedBox(
+                        height: 200,
+                        child: ListView(
+                          shrinkWrap: true,
+                          children: expiryWarningCards,
+                        ),
+                      )
+                    : _buildNoWarningsWidget(),
             ],
           ),
         ],
       ),
     );
   }
+
+ Widget _buildNoWarningsWidget() {
+  return SizedBox(
+    height: 250,
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text(
+          'No Current Warnings',
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 61, 79, 88),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Image.asset(
+          'lib/images/fighter-jet.gif',
+          width: 150,
+          height: 150, 
+        ),
+      ],
+    ),
+  );
+}
+
 
   Future<int> getLastFlightTime() async {
     User? user = FirebaseAuth.instance.currentUser;
