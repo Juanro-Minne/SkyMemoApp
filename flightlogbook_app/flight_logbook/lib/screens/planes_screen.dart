@@ -186,17 +186,15 @@ class _PlanesScreenState extends State<PlanesScreen>
           if (imageURL != null) 'imageUrl': imageURL,
         });
       }
-      setState(() {
-        _registrationController.clear();
-        _engineTypeController.clear();
-        _totalHoursController.clear();
-        _imageUrlController.clear();
-      });
+      _engineTypeController.clear();
+      _registrationController.clear();
+      _totalHoursController.clear();
+      setState(() {});
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Plane added successfully'),
-          backgroundColor: Color.fromARGB(255, 105, 123, 240),
+          backgroundColor: Color.fromARGB(255, 152, 154, 171),
           duration: Duration(seconds: 1),
         ),
       );
@@ -359,47 +357,48 @@ class _PlanesScreenState extends State<PlanesScreen>
   }
 
   Future<void> _deletePlane(String? planeId) async {
-  try {
-    if (planeId != null) {
-      bool confirmDelete = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Confirm Delete'),
-            content: const Text('Are you sure you want to delete this plane?'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Delete'),
-              ),
-            ],
-          );
-        },
-      );
-
-      if (confirmDelete == true) {
-        await _firestore.collection('planes').doc(planeId).delete();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Plane deleted successfully'),
-            backgroundColor: Color.fromARGB(255, 105, 123, 240),
-            duration: Duration(seconds: 3),
-          ),
+    try {
+      if (planeId != null) {
+        bool confirmDelete = await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Confirm Delete'),
+              content:
+                  const Text('Are you sure you want to delete this plane?'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text('Delete'),
+                ),
+              ],
+            );
+          },
         );
-      }
-    }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.redAccent.withOpacity(0.7),
-        content: Text('Failed to delete plane: $e'),
-      ),
-    );
-  }
-}
 
+        if (confirmDelete == true) {
+          await _firestore.collection('planes').doc(planeId).delete();
+          setState(() {});
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Plane deleted successfully'),
+              backgroundColor: Color.fromARGB(255, 152, 154, 171),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent.withOpacity(0.7),
+          content: Text('Failed to delete plane: $e'),
+        ),
+      );
+    }
+  }
 }

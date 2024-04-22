@@ -69,6 +69,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             MyButton(
               onTap: passwordReset,
               description: 'Reset Password',
+              disabled: false,
             ),
             const SizedBox(height: 10),
           ],

@@ -159,6 +159,10 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     }
   }
 
+  bool _canUploadDocument() {
+    return _selectedFile != null && _expiryDate != null;
+  }
+
   Future<void> _downloadFile(String fileName) async {
     try {
       final storageRef = FirebaseStorage.instance.ref('documents/$fileName');
@@ -270,6 +274,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             MyButton(
               onTap: _selectFile,
               description: 'Select File',
+              disabled: false,
             ),
             _selectedFile != null
                 ? const Center(
@@ -306,6 +311,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             MyButton(
               onTap: () => _selectExpiryDate(context),
               description: 'Select Expiry Date',
+              disabled: false,
             ),
             Padding(
               padding: const EdgeInsets.all(10),
@@ -322,15 +328,15 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             ),
             const SizedBox(height: 10),
             MyButton(
-              onTap: _uploadDocument,
+              onTap: _canUploadDocument() ? _uploadDocument : null,
               description: 'Upload Document',
+              disabled: !_canUploadDocument(),
             ),
             const SizedBox(height: 10),
             const Divider(
               color: Colors.blueGrey,
               thickness: 2,
             ),
-            
             const Text(
               'User Documents:',
               style: TextStyle(
@@ -339,7 +345,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-             const Divider(
+            const Divider(
               color: Colors.blueGrey,
               thickness: 2,
             ),
