@@ -68,17 +68,16 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
                 const SizedBox(height: 20.0),
                 DropdownButtonFormField<String>(
                   decoration: InputDecoration(
-                    enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blueGrey),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey.shade400),
-                    ),
-                    fillColor: Colors.grey.shade200,
-                    filled: true,
-                    labelText: 'Select Engine type',
-                    hintStyle: TextStyle(color: Colors.grey[500])
-                  ),
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blueGrey),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey.shade400),
+                      ),
+                      fillColor: Colors.grey.shade200,
+                      filled: true,
+                      labelText: 'Select Engine type',
+                      hintStyle: TextStyle(color: Colors.grey[500])),
                   value: _selectedEngineType,
                   items: _engineTypes.map((String engineType) {
                     return DropdownMenuItem(
@@ -178,6 +177,9 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
                       if (_formKey.currentState!.validate()) {
                         String registration =
                             _registrationController.text.trim().toUpperCase();
+
+                        registration = '${registration.substring(0, 2)}-${registration.substring(2)}';
+
                         int totalHours =
                             int.parse(_totalHoursController.text.trim());
 

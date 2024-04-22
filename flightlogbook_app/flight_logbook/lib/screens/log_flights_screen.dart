@@ -238,6 +238,8 @@ Future<void> _deleteFlight(String flightId) async {
 
     if (confirmDelete == true) {
       await _firestore.collection('flights').doc(flightId).delete();
+      setState(() {
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Flight deleted successfully'),
