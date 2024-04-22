@@ -178,7 +178,6 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
                       if (_formKey.currentState!.validate()) {
                         String registration =
                             _registrationController.text.trim().toUpperCase();
-                        String engineType = _engineTypeController.text.trim();
                         int totalHours =
                             int.parse(_totalHoursController.text.trim());
 
