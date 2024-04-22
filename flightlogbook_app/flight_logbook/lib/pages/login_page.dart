@@ -187,6 +187,7 @@ class _LoginPageState extends State<LoginPage> {
                 MyButton(
                   onTap: signUserIn,
                   description: 'Sign In',
+                  disabled: false,
                 ),
                 const SizedBox(height: 15),
                 MyButton(
@@ -195,6 +196,7 @@ class _LoginPageState extends State<LoginPage> {
                     emailController.clear();
                   },
                   description: 'Clear',
+                  disabled: false,
                 ),
                 const SizedBox(height: 30),
                 Padding(

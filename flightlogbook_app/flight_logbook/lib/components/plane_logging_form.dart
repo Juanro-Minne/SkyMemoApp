@@ -1,5 +1,3 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
 import 'package:flight_logbook/components/custom_button.dart';
 import 'package:flight_logbook/components/custom_textfield.dart';
@@ -65,7 +63,7 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 20.0),
+                const SizedBox(height: 25.0),
                 DropdownButtonFormField<String>(
                   decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
@@ -97,7 +95,7 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 20.0),
+                const SizedBox(height: 25.0),
                 CustomTextField(
                   controller: _totalHoursController,
                   labelText: 'Total Hours',
@@ -109,77 +107,96 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16.0),
-                Center(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueGrey,
-                            foregroundColor:
-                                const Color.fromARGB(255, 245, 228, 178),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          onPressed: () async {
-                            final pickedFile = await ImagePicker()
-                                .pickImage(source: ImageSource.gallery);
-                            if (pickedFile != null) {
-                              setState(() {
-                                _imageFile = File(pickedFile.path);
-                              });
-                            }
-                          },
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Icon(Icons.cloud_upload),
-                              SizedBox(width: 15),
-                              Text('Upload Image here',
-                                  style: TextStyle(fontSize: 15)),
-                            ],
-                          ),
+                const SizedBox(height: 25.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueGrey,
+                        foregroundColor:
+                            const Color.fromARGB(255, 245, 228, 178),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: SizedBox(height: 15.0),
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _imageFile != null
-                                ? const Icon(
-                                    Icons.check,
-                                    color: Colors.green,
-                                  )
-                                : const SizedBox(width: 8),
-                            _imageFile != null
-                                ? const Text(
-                                    'Image selected',
-                                    style: TextStyle(fontSize: 13),
-                                  )
-                                : const Text(''),
-                          ],
-                        )
-                      ]),
+                      ),
+                      onPressed: () async {
+                        final pickedFile = await ImagePicker()
+                            .pickImage(source: ImageSource.gallery);
+                        if (pickedFile != null) {
+                          setState(() {
+                            _imageFile = File(pickedFile.path);
+                          });
+                        }
+                      },
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Icon(Icons.cloud_upload),
+                          SizedBox(width: 30),
+                          Text('Upload Image here',
+                              style: TextStyle(fontSize: 15)),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
+                _imageFile != null
+                    ? Container(
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.all(10.0),
+                        child: Stack(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8.0),
+                                border: Border.all(
+                                  color: Colors.grey,
+                                  width: 1.0,
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8.0),
+                                child: Image.file(
+                                  _imageFile!,
+                                  width: 270,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: -8,
+                              right: -8,
+                              child: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _imageFile = null;
+                                  });
+                                },
+                                icon: const Icon(Icons.remove_circle),
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : const SizedBox.shrink(),
                 const Divider(
                   color: Colors.blueGrey,
                   thickness: 1,
                 ),
-                const SizedBox(height: 15.0),
+                const SizedBox(height: 15.0, width: 20.0),
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: MyButton(
+                    disabled: false,
                     onTap: () async {
                       if (_formKey.currentState!.validate()) {
                         String registration =
                             _registrationController.text.trim().toUpperCase();
-
-                        registration = '${registration.substring(0, 2)}-${registration.substring(2)}';
-
+                        registration =
+                            '${registration.substring(0, 2)}-${registration.substring(2)}';
                         int totalHours =
                             int.parse(_totalHoursController.text.trim());
 
@@ -201,8 +218,12 @@ class _PlaneLoggingFormState extends State<PlaneLoggingForm> {
                       _engineTypeController.clear();
                       _registrationController.clear();
                       _totalHoursController.clear();
+                      setState(() {
+                        _imageFile = null;
+                      });
                     },
                     description: "Clear",
+                    disabled: false,
                   ),
                 ),
               ],
