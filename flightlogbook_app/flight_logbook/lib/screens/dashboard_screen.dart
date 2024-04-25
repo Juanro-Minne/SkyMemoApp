@@ -158,7 +158,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 5),
+              FutureBuilder<int>(
+                future: getTotalHours(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const LinearProgressIndicator(
+                        color: Color.fromARGB(255, 255, 196, 85));
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    return SizedBox(
+                      width: 800,
+                      child: Chip(
+                        padding: const EdgeInsets.fromLTRB(120, 0, 120, 0),
+                        label: Text(
+                          'Total Flight Hours: ${snapshot.data}',
+                          style: const TextStyle(
+                              color: Color.fromARGB(255, 0, 0, 0),
+                              fontSize: 14),
+                        ),
+                        backgroundColor:
+                            const Color.fromARGB(255, 234, 199, 112),
+                      ),
+                    );
+                  }
+                },
+              ),
+              const SizedBox(height: 5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -174,7 +201,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -190,7 +217,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 3),
               const Divider(
                 color: Colors.blueGrey,
                 thickness: 2,
@@ -223,16 +250,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               _isLoading
                   ? const SpinKitHourGlass(
-                    color: Color.fromARGB(255, 255, 196, 85))
-                : expiryWarningCards.isNotEmpty
-                    ? SizedBox(
-                        height: 200,
-                        child: ListView(
-                          shrinkWrap: true,
-                          children: expiryWarningCards,
-                        ),
-                      )
-                    : _buildNoWarningsWidget(),
+                      color: Color.fromARGB(255, 255, 196, 85))
+                  : expiryWarningCards.isNotEmpty
+                      ? SizedBox(
+                          height: 200,
+                          child: ListView(
+                            shrinkWrap: true,
+                            children: expiryWarningCards,
+                          ),
+                        )
+                      : _buildNoWarningsWidget(),
             ],
           ),
         ],
@@ -240,31 +267,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
- Widget _buildNoWarningsWidget() {
-  return SizedBox(
-    height: 250,
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Text(
-          'No Current Warnings',
-          style: TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.bold,
-            color: Color.fromARGB(255, 61, 79, 88),
-          ),
-        ),
-        const SizedBox(height: 10),
-        Image.asset(
-          'lib/images/fighter-jet.gif',
-          width: 160,
-          height: 160, 
-        ),
-      ],
-    ),
-  );
-}
+  Future<int> getTotalHours() async {
+    int totalHours = 0;
+    User? user = FirebaseAuth.instance.currentUser;
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('planes')
+          .where('userId', isEqualTo: user?.email)
+          .get();
 
+      for (var doc in querySnapshot.docs) {
+        totalHours += doc['totalHours'] as int;
+      }
+    } catch (error) {
+      print('Error getting total hours: $error');
+    }
+    return totalHours;
+  }
+
+  Widget _buildNoWarningsWidget() {
+    return SizedBox(
+      height: 250,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            'No Current Warnings',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+              color: Color.fromARGB(255, 61, 79, 88),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Image.asset(
+            'lib/images/fighter-jet.gif',
+            width: 160,
+            height: 160,
+          ),
+        ],
+      ),
+    );
+  }
 
   Future<int> getLastFlightTime() async {
     User? user = FirebaseAuth.instance.currentUser;

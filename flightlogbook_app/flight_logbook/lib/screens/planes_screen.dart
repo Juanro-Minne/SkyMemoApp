@@ -23,7 +23,7 @@ class _PlanesScreenState extends State<PlanesScreen>
   final TextEditingController _registrationController = TextEditingController();
   final TextEditingController _engineTypeController = TextEditingController();
   final TextEditingController _totalHoursController = TextEditingController();
-  final TextEditingController _imageUrlController = TextEditingController();
+  // final TextEditingController _imageUrlController = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
