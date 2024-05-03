@@ -335,7 +335,7 @@ class _PlanesScreenState extends State<PlanesScreen>
                                 ),
                               ),
                               const Text(
-                                'note: Swipe left to Plane',
+                                'Swipe left to delete Plane',
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: Color.fromARGB(255, 234, 80, 69),

@@ -198,7 +198,7 @@ class _LogFlightsScreenState extends State<LogFlightsScreen>
                                 fontSize: 16, color: Colors.black),
                           ),
                           const Text(
-                            'note: Swipe left delete flight',
+                            'Swipe left delete flight',
                             style: TextStyle(fontSize: 13, color: Colors.red),
                           )
                         ],
