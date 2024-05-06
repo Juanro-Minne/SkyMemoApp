@@ -94,7 +94,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Widget expiryCard = Card(
             color: const Color.fromARGB(255, 230, 215, 194),
             child: ListTile(
-              title: Text('Document: $fileName'),
+              title: Text('$fileName'),
               subtitle: Text('Expires in $daysUntilExpiry days'),
             ),
           );
@@ -105,7 +105,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Widget expiredCard = Card(
             color: const Color.fromARGB(255, 255, 131, 122),
             child: ListTile(
-              title: Text('Document: $fileName'),
+              title: Text('$fileName'),
               subtitle: const Text('This document has expired'),
             ),
           );
@@ -234,7 +234,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   SizedBox(width: 10),
                   Center(
                     child: Text(
-                      "Expiration Warnings:",
+                      "Document Expirations:",
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 19,
