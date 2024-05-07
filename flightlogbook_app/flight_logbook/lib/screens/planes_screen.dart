@@ -301,15 +301,15 @@ class _PlanesScreenState extends State<PlanesScreen>
                               ),
                             ],
                           ),
-                          title: const Text(
-                            "Plane Info:",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              decoration: TextDecoration.underline,
-                              fontSize: 19,
-                              color: Colors.black,
-                            ),
-                          ),
+                          // title: const Text(
+                          //   "Plane Info:",
+                          //   style: TextStyle(
+                          //     fontWeight: FontWeight.w500,
+                          //     decoration: TextDecoration.underline,
+                          //     fontSize: 19,
+                          //     color: Colors.black,
+                          //   ),
+                          // ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
