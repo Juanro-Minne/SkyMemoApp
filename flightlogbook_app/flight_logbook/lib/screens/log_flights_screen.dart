@@ -371,7 +371,7 @@ Future<void> _deleteFlight(String flightId) async {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Flight logged successfully'),
-              backgroundColor: Color.fromARGB(255, 199, 204, 231),
+              backgroundColor: Color.fromARGB(255, 152, 156, 176),
               duration: Duration(seconds: 2),
             ),
           );
